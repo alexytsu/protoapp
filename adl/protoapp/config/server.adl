@@ -1,5 +1,7 @@
 module protoapp.config.server {
 
+import common.hashing.Algorithm;
+
 struct ServerConfig {
     DbConnectionConfig db;
 
@@ -13,6 +15,7 @@ struct ServerConfig {
 
     String http_bind_addr = "0.0.0.0:8080";
 
+    Algorithm password_hashing_algo = {"argon2id": {}};
 };
 
 struct DbConnectionConfig {
@@ -22,5 +25,19 @@ struct DbConnectionConfig {
     String user;
     String password;
 };
+
+struct AccessClaims {
+    String iss;
+    String sub;
+    Int64 exp;
+    String role;
+};
+
+struct RefreshClaims {
+    String iss;
+    String sub;
+    Int64 exp;
+};
+
 
 };

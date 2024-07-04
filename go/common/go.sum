@@ -1,0 +1,8 @@
+github.com/adl-lang/goadl_rt/v3 v3.0.0-alpha.8 h1:F5hqx/ZdufvRxXwVY/0l9EFuLeky1qSJHmcz3/CZS8o=
+github.com/adl-lang/goadl_rt/v3 v3.0.0-alpha.8/go.mod h1:OTKpMzWp6Wcau9RBvjMmkvADMoI9azo/xocnh+4f38k=
+github.com/iancoleman/strcase v0.3.0 h1:nTXanmYxhfFAMjZL34Ov6gkzEsSJZ5DbhxWjvSASxEI=
+github.com/iancoleman/strcase v0.3.0/go.mod h1:iwCmte+B7n89clKwxIoIXy/HfoL7AsD47ZCWhYzw7ho=
+github.com/samber/lo v1.44.0 h1:5il56KxRE+GHsm1IR+sZ/6J42NODigFiqCWpSc2dybA=
+github.com/samber/lo v1.44.0/go.mod h1:RmDH9Ct32Qy3gduHQuKJ3gW1fMHAnE/fAzQuf6He5cU=
+golang.org/x/text v0.16.0 h1:a94ExnEXNtEwYLGJSIUxnWoxoRz/ZcCsV63ROupILh4=
+golang.org/x/text v0.16.0/go.mod h1:GhwF1Be+LQoKShO3cGOHzqOgRrGaYc9AvblQOmPVHnI=

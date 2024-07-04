@@ -9,6 +9,8 @@ services:
       POSTGRES_DB: appdb
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: xyzzy
+    volumes:
+      - ../../sql/adl-gen:/docker-entrypoint-initdb.d/
 
   postgrest:
     container_name: protoapp-postgrest
