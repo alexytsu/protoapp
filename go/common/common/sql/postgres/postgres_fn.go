@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/adl-lang/goadl_common/common/db"
 	goadl "github.com/adl-lang/goadl_rt/v3"
 	"github.com/adl-lang/goadl_rt/v3/sys/adlast"
 	"github.com/iancoleman/strcase"
@@ -44,12 +45,25 @@ func Insert[T any](te adlast.ATypeExpr[T], vals ...T) (string, []any) {
 	return sql, flds
 }
 
-func Fileds[T any](te adlast.ATypeExpr[T], val T) []any {
+func Fields[T any](te adlast.ATypeExpr[T], val T) []any {
 	ie := InsertExprs[T]{}
 	rv := reflect.ValueOf(val)
 	flds := []any{}
 	ie.getFields(te.Value, rv, &flds)
 	return flds
+}
+
+func getTableName(decl *adlast.ScopedDecl) string {
+	if goadl.HasAnnotation(decl.Decl.Annotations, SN_DbTable) {
+		jb := goadl.CreateJsonDecodeBinding(db.Texpr_DbTable(), goadl.RESOLVER)
+		dbt, _ := goadl.GetAnnotation(decl.Decl.Annotations, SN_DbTable, jb)
+		if dbt.Table_name != "" {
+			return dbt.Table_name
+		} else {
+			return strings.TrimSuffix(strcase.ToSnake(decl.Decl.Name), "_table")
+		}
+	}
+	return ""
 }
 
 func (sp *InsertExprs[T]) getCols(te adlast.TypeExpr) {
@@ -60,6 +74,9 @@ func (sp *InsertExprs[T]) getCols(te adlast.TypeExpr) {
 	decl := goadl.RESOLVER.Resolve(ref)
 	if decl == nil {
 		panic("decl not registered " + ref.ModuleName + "." + ref.Name)
+	}
+	if sp.TableName == "" {
+		sp.TableName = getTableName(decl)
 	}
 	tp := goadl.TypeParamsFromDecl(decl.Decl)
 	binder := goadl.CreateDecBoundTypeParams(tp, te.Parameters)
@@ -171,9 +188,10 @@ func (sp InsertExprs[T]) getFields(te adlast.TypeExpr, rv reflect.Value, flds *[
 
 func (sp *SelectExprsFrom) Select() string {
 	exprs := sp.expressions()
-	if len(sp.Wheres) != 0 {
-		panic("coding error, where clause set, much call Select on value returned by .WhereXxYy ie. method on SelectExprsFromWhere")
-	}
+	// if len(sp.Wheres) != 0 {
+	// 	return
+	// 	panic("coding error, where clause set, much call Select on value returned by .WhereXxYy ie. method on SelectExprsFromWhere")
+	// }
 	sel := fmt.Sprintf(`select %s from %s %s`,
 		strings.Join(exprs, ", "),
 		sp.TableName,
@@ -181,9 +199,8 @@ func (sp *SelectExprsFrom) Select() string {
 	)
 	return sel
 }
-
 func (sp *SelectExprsFromWhere) Select() (string, []any) {
-	exprs := sp.expressions()
+	sql := sp.SelectExprsFrom.Select()
 	wc := lo.Map[WhereCondition, string](sp.Wheres, func(item WhereCondition, index int) string {
 		return Handle_WhereCondition[string](
 			item,
@@ -195,15 +212,26 @@ func (sp *SelectExprsFromWhere) Select() (string, []any) {
 	})
 	wheres := ""
 	if len(wc) != 0 {
-		wheres = "where " + strings.Join(wc, " and ")
+		wheres = " where " + strings.Join(wc, " and ")
 	}
-	sel := fmt.Sprintf(`select %s from %s %s %s`,
-		strings.Join(exprs, ", "),
-		sp.TableName,
-		sp.TableAlias,
-		wheres,
-	)
-	return sel, sp.Params
+	sql = sql + wheres
+	return sql, sp.Params
+}
+func (sp *SelectExprsFromLimit) Select() (string, []any) {
+	sql, flds := sp.SelectExprsFromWhere.Select()
+	if sp.Limit != nil {
+		sql = sql + " limit " + "$" + strconv.Itoa(len(flds)+1)
+		flds = append(flds, *sp.Limit)
+	}
+	return sql, flds
+}
+func (sp *SelectExprsFromOffset) Select() (string, []any) {
+	sql, flds := sp.SelectExprsFromLimit.Select()
+	if sp.Offset != nil {
+		sql = sql + " offset " + "$" + strconv.Itoa(len(flds)+1)
+		flds = append(flds, *sp.Offset)
+	}
+	return sql, flds
 }
 
 func (sp *SelectJoin) Select() string {
@@ -248,14 +276,72 @@ type SelectExprsFromWhere struct {
 	Params []any
 }
 
+type SelectExprsFromLimit struct {
+	SelectExprsFromWhere
+	Limit *uint64
+}
+
+type SelectExprsFromOffset struct {
+	SelectExprsFromLimit
+	Offset *uint64
+}
+
 func (sp *SelectExprsFrom) WhereEqStr(col string, val string) *SelectExprsFromWhere {
-	sp.Wheres = append(sp.Wheres, Make_WhereCondition_eqStr(Make_WhereEq[string](col)))
 	spw := &SelectExprsFromWhere{
 		SelectExprsFrom: *sp,
-		Params:          []any{val},
 	}
-	return spw
+	return spw.WhereEqStr(col, val)
+	// sp.Wheres = append(sp.Wheres, Make_WhereCondition_eqStr(Make_WhereEq[string](col)))
+	// spw := &SelectExprsFromWhere{
+	// 	SelectExprsFrom: *sp,
+	// 	Params:          []any{val},
+	// }
+	// return spw
 }
+func (sp *SelectExprsFrom) Limit(limit uint64) *SelectExprsFromLimit {
+	return &SelectExprsFromLimit{
+		SelectExprsFromWhere: SelectExprsFromWhere{
+			SelectExprsFrom: *sp,
+			Params:          []any{},
+		},
+		Limit: &limit,
+	}
+}
+func (sp *SelectExprsFromWhere) Limit(limit uint64) *SelectExprsFromLimit {
+	return &SelectExprsFromLimit{
+		SelectExprsFromWhere: *sp,
+		Limit:                &limit,
+	}
+}
+
+func (sp *SelectExprsFrom) Offset(offset uint64) *SelectExprsFromOffset {
+	return &SelectExprsFromOffset{
+		SelectExprsFromLimit: SelectExprsFromLimit{
+			SelectExprsFromWhere: SelectExprsFromWhere{
+				SelectExprsFrom: *sp,
+				Params:          []any{},
+			},
+			Limit: nil,
+		},
+		Offset: &offset,
+	}
+}
+func (sp *SelectExprsFromWhere) Offset(offset uint64) *SelectExprsFromOffset {
+	return &SelectExprsFromOffset{
+		SelectExprsFromLimit: SelectExprsFromLimit{
+			SelectExprsFromWhere: *sp,
+			Limit:                nil,
+		},
+		Offset: &offset,
+	}
+}
+func (sp *SelectExprsFromLimit) Offset(offset uint64) *SelectExprsFromOffset {
+	return &SelectExprsFromOffset{
+		SelectExprsFromLimit: *sp,
+		Offset:               &offset,
+	}
+}
+
 func (sp *SelectExprsFromWhere) WhereEqStr(col string, val string) *SelectExprsFromWhere {
 	sp.Wheres = append(sp.Wheres, Make_WhereCondition_eqStr(Make_WhereEq[string](col)))
 	sp.Params = append(sp.Params, val)
@@ -272,11 +358,8 @@ func (sp *SelectExprsFrom) sql(te adlast.TypeExpr, alias string, prefix []string
 		panic("decl not registered " + ref.ModuleName + "." + ref.Name)
 	}
 	if sp.TableName == "" {
-		if goadl.HasAnnotation(decl.Decl.Annotations, SN_DbTable) {
-			sp.TableName = strings.TrimSuffix(strcase.ToSnake(decl.Decl.Name), "_table")
-			sp.TableAlias = alias
-			// fmt.Printf("set table name and alias %v\n", sp)
-		}
+		sp.TableName = getTableName(decl)
+		sp.TableAlias = alias
 	}
 	tp := goadl.TypeParamsFromDecl(decl.Decl)
 	binder := goadl.CreateDecBoundTypeParams(tp, te.Parameters)

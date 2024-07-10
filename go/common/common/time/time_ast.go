@@ -6,6 +6,7 @@ import (
 	"github.com/adl-lang/goadl_rt/v3/customtypes"
 	"github.com/adl-lang/goadl_rt/v3/sys/adlast"
 	"github.com/adl-lang/goadl_rt/v3/sys/types"
+	"time"
 )
 
 func Texpr_DayOfWeek() adlast.ATypeExpr[DayOfWeek] {
@@ -165,14 +166,14 @@ func init() {
 	)
 }
 
-func Texpr_Instant() adlast.ATypeExpr[Instant] {
+func Texpr_Instant() adlast.ATypeExpr[time.Time] {
 	te := adlast.Make_TypeExpr(
 		adlast.Make_TypeRef_reference(
 			adlast.Make_ScopedName("common.time", "Instant"),
 		),
 		[]adlast.TypeExpr{},
 	)
-	return adlast.Make_ATypeExpr[Instant](te)
+	return adlast.Make_ATypeExpr[time.Time](te)
 }
 
 func AST_Instant() adlast.ScopedDecl {
@@ -191,7 +192,7 @@ func AST_Instant() adlast.ScopedDecl {
 				types.Make_Maybe_nothing[any](),
 			),
 		),
-		customtypes.MapMap[adlast.ScopedName, any]{adlast.Make_ScopedName("sys.annotations", "Doc"): "A instant in time, represented as milliseconds from\nthe epoch of \"1970-01-01T00:00:00Z\n"},
+		customtypes.MapMap[adlast.ScopedName, any]{adlast.Make_ScopedName("adlc.config.go_", "GoCustomType"): map[string]interface{}{"gotype": map[string]interface{}{"import_path": "time", "name": "Time", "pkg": "time", "type_constraints": []interface{}{}}, "helpers": map[string]interface{}{"name": "InstantHelpers", "ref": interface{}(nil)}}, adlast.Make_ScopedName("sys.annotations", "Doc"): "A instant in time, represented as milliseconds from\nthe epoch of \"1970-01-01T00:00:00Z\n"},
 	)
 	return adlast.Make_ScopedDecl("common.time", decl)
 }
@@ -201,16 +202,20 @@ func init() {
 		adlast.Make_ScopedName("common.time", "Instant"),
 		AST_Instant(),
 	)
+	goadl.RESOLVER.RegisterHelper(
+		adlast.Make_ScopedName("common.time", "Instant"),
+		(*InstantHelpers)(nil),
+	)
 }
 
-func Texpr_LocalDate() adlast.ATypeExpr[LocalDate] {
+func Texpr_LocalDate() adlast.ATypeExpr[time.Time] {
 	te := adlast.Make_TypeExpr(
 		adlast.Make_TypeRef_reference(
 			adlast.Make_ScopedName("common.time", "LocalDate"),
 		),
 		[]adlast.TypeExpr{},
 	)
-	return adlast.Make_ATypeExpr[LocalDate](te)
+	return adlast.Make_ATypeExpr[time.Time](te)
 }
 
 func AST_LocalDate() adlast.ScopedDecl {
@@ -231,7 +236,7 @@ func AST_LocalDate() adlast.ScopedDecl {
 				),
 			),
 		),
-		customtypes.MapMap[adlast.ScopedName, any]{adlast.Make_ScopedName("sys.annotations", "Doc"): "A date in ISO8601 format\n"},
+		customtypes.MapMap[adlast.ScopedName, any]{adlast.Make_ScopedName("adlc.config.go_", "GoCustomType"): map[string]interface{}{"gotype": map[string]interface{}{"import_path": "time", "name": "Time", "pkg": "time", "type_constraints": []interface{}{}}, "helpers": map[string]interface{}{"name": "LocalDateHelpers", "ref": interface{}(nil)}}, adlast.Make_ScopedName("sys.annotations", "Doc"): "A date in ISO8601 format\n"},
 	)
 	return adlast.Make_ScopedDecl("common.time", decl)
 }
@@ -241,16 +246,20 @@ func init() {
 		adlast.Make_ScopedName("common.time", "LocalDate"),
 		AST_LocalDate(),
 	)
+	goadl.RESOLVER.RegisterHelper(
+		adlast.Make_ScopedName("common.time", "LocalDate"),
+		(*LocalDateHelpers)(nil),
+	)
 }
 
-func Texpr_LocalDateTime() adlast.ATypeExpr[LocalDateTime] {
+func Texpr_LocalDateTime() adlast.ATypeExpr[time.Time] {
 	te := adlast.Make_TypeExpr(
 		adlast.Make_TypeRef_reference(
 			adlast.Make_ScopedName("common.time", "LocalDateTime"),
 		),
 		[]adlast.TypeExpr{},
 	)
-	return adlast.Make_ATypeExpr[LocalDateTime](te)
+	return adlast.Make_ATypeExpr[time.Time](te)
 }
 
 func AST_LocalDateTime() adlast.ScopedDecl {
@@ -271,7 +280,7 @@ func AST_LocalDateTime() adlast.ScopedDecl {
 				),
 			),
 		),
-		customtypes.MapMap[adlast.ScopedName, any]{adlast.Make_ScopedName("sys.annotations", "Doc"): "A datetime in ISO8601 format\n"},
+		customtypes.MapMap[adlast.ScopedName, any]{adlast.Make_ScopedName("adlc.config.go_", "GoCustomType"): map[string]interface{}{"gotype": map[string]interface{}{"import_path": "time", "name": "Time", "pkg": "time", "type_constraints": []interface{}{}}, "helpers": map[string]interface{}{"name": "LocalDateTimeHelpers", "ref": interface{}(nil)}}, adlast.Make_ScopedName("sys.annotations", "Doc"): "A datetime in ISO8601 format\n"},
 	)
 	return adlast.Make_ScopedDecl("common.time", decl)
 }
@@ -281,16 +290,20 @@ func init() {
 		adlast.Make_ScopedName("common.time", "LocalDateTime"),
 		AST_LocalDateTime(),
 	)
+	goadl.RESOLVER.RegisterHelper(
+		adlast.Make_ScopedName("common.time", "LocalDateTime"),
+		(*LocalDateTimeHelpers)(nil),
+	)
 }
 
-func Texpr_LocalTime() adlast.ATypeExpr[LocalTime] {
+func Texpr_LocalTime() adlast.ATypeExpr[time.Time] {
 	te := adlast.Make_TypeExpr(
 		adlast.Make_TypeRef_reference(
 			adlast.Make_ScopedName("common.time", "LocalTime"),
 		),
 		[]adlast.TypeExpr{},
 	)
-	return adlast.Make_ATypeExpr[LocalTime](te)
+	return adlast.Make_ATypeExpr[time.Time](te)
 }
 
 func AST_LocalTime() adlast.ScopedDecl {
@@ -311,7 +324,7 @@ func AST_LocalTime() adlast.ScopedDecl {
 				),
 			),
 		),
-		customtypes.MapMap[adlast.ScopedName, any]{adlast.Make_ScopedName("sys.annotations", "Doc"): "A time in ISO8601 format\n"},
+		customtypes.MapMap[adlast.ScopedName, any]{adlast.Make_ScopedName("adlc.config.go_", "GoCustomType"): map[string]interface{}{"gotype": map[string]interface{}{"import_path": "time", "name": "Time", "pkg": "time", "type_constraints": []interface{}{}}, "helpers": map[string]interface{}{"name": "LocalTimeHelpers", "ref": interface{}(nil)}}, adlast.Make_ScopedName("sys.annotations", "Doc"): "A time in ISO8601 format\n"},
 	)
 	return adlast.Make_ScopedDecl("common.time", decl)
 }
@@ -320,6 +333,10 @@ func init() {
 	goadl.RESOLVER.Register(
 		adlast.Make_ScopedName("common.time", "LocalTime"),
 		AST_LocalTime(),
+	)
+	goadl.RESOLVER.RegisterHelper(
+		adlast.Make_ScopedName("common.time", "LocalTime"),
+		(*LocalTimeHelpers)(nil),
 	)
 }
 

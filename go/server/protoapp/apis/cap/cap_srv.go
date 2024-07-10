@@ -44,9 +44,9 @@ func Register_ApiRequests(
 }
 
 type AccessApiRequests_Service[C any, S any] interface {
-	NewMessage(ctx context.Context, cap S, req NewMessageReq) (db.MessageId, error)
-	RecentMessages(ctx context.Context, cap S, req RecentMessagesReq) (Paginated[Message], error)
-	WhoAmI(ctx context.Context, cap S) (UserProfile, error)
+	NewMessage(ctx context.Context, cp S, req NewMessageReq) (db.MessageId, error)
+	RecentMessages(ctx context.Context, cp S, req RecentMessagesReq) (Paginated[Message], error)
+	WhoAmI(ctx context.Context, cp S) (UserProfile, error)
 }
 
 func Register_AccessApiRequests[C any, S any](
@@ -62,7 +62,7 @@ func Register_AccessApiRequests[C any, S any](
 }
 
 type RefreshApiRequests_Service[C any, S any] interface {
-	Refresh(ctx context.Context, cap S, req RefreshReq) (RefreshResp, error)
+	Refresh(ctx context.Context, cp S, req RefreshReq) (RefreshResp, error)
 }
 
 func Register_RefreshApiRequests[C any, S any](

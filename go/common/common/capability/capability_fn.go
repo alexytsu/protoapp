@@ -18,6 +18,13 @@ type CapabilityRetriever[C any, S any] interface {
 
 var endpoints *expvar.Map = expvar.NewMap("endpoints")
 
+type CONTEXT_KEY string
+
+const (
+	REQ_KEY  CONTEXT_KEY = "req"
+	RESP_KEY CONTEXT_KEY = "resp"
+)
+
 func AdlPost[I any, O any](
 	serveMux *http.ServeMux,
 	endpoint HttpPost[I, O],
@@ -34,7 +41,10 @@ func AdlPost[I any, O any](
 			return
 		}
 
-		resp, err := fn(r.Context(), req)
+		resp, err := fn(
+			context.WithValue(context.WithValue(r.Context(), REQ_KEY, r), RESP_KEY, w),
+			req,
+		)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("error : %v", err), http.StatusInternalServerError)
 			return
@@ -56,7 +66,9 @@ func AdlGet[O any](
 	resp_enc := goadl.CreateJsonEncodeBinding(endpoint.RespType, goadl.RESOLVER)
 	endpoints.Set(endpoint.Path, &expvar.String{})
 	serveMux.HandleFunc(endpoint.Path, func(w http.ResponseWriter, r *http.Request) {
-		resp, err := fn(r.Context())
+		resp, err := fn(
+			context.WithValue(context.WithValue(r.Context(), REQ_KEY, r), RESP_KEY, w),
+		)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("error : %v", err), http.StatusInternalServerError)
 			return
@@ -97,7 +109,11 @@ func AdlCapPost[I any, O any, C any, S any, V any](
 			http.Error(w, fmt.Sprintf("error decoding body : %v", err), http.StatusUnprocessableEntity)
 			return
 		}
-		resp, err := fn(r.Context(), cap, req)
+		resp, err := fn(
+			context.WithValue(context.WithValue(r.Context(), REQ_KEY, r), RESP_KEY, w),
+			cap,
+			req,
+		)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("error : %v", err), http.StatusInternalServerError)
 			return
@@ -151,7 +167,10 @@ func AdlCapGet[O any, C any, S any, V any](
 			http.Error(w, fmt.Sprintf("%v", err), http.StatusUnauthorized)
 			return
 		}
-		resp, err := fn(r.Context(), cap)
+		resp, err := fn(
+			context.WithValue(context.WithValue(r.Context(), REQ_KEY, r), RESP_KEY, w),
+			cap,
+		)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("error : %v", err), http.StatusInternalServerError)
 			return

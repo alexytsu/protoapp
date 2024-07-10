@@ -36,10 +36,12 @@ type RefreshTokener interface {
 }
 
 func (sc ServerConfig) CreateAccessToken(userID string, role string) (string, error) {
+	exp := jwt.NewNumericDate(time.Now().Add(time.Second * time.Duration(sc.Jwt_access_expiry_secs)))
 	ac := Make_AccessClaims(
 		sc.Jwt_issuer,
 		userID,
-		int64(sc.Jwt_access_expiry_secs),
+		// int64(sc.Jwt_access_expiry_secs),
+		exp.Unix(),
 		role,
 	)
 	token := jwt.NewWithClaims(
@@ -71,10 +73,11 @@ func (sc ServerConfig) ParseAccessToken(tokenTxt string) (AccessClaims, error) {
 }
 
 func (sc ServerConfig) CreateRefreshToken(userID string) (string, error) {
+	exp := jwt.NewNumericDate(time.Now().Add(time.Second * time.Duration(sc.Jwt_refresh_expiry_secs)))
 	ac := Make_RefreshClaims(
 		sc.Jwt_issuer,
 		userID,
-		int64(sc.Jwt_refresh_expiry_secs),
+		exp.Unix(),
 	)
 	token := jwt.NewWithClaims(
 		jwt.SigningMethodHS256,
@@ -112,40 +115,20 @@ func (sc ServerConfig) refreshKeyFunc(t *jwt.Token) (interface{}, error) {
 	return []byte(sc.Jwt_refresh_secret), nil
 }
 
-func (a AccessClaims) GetAudience() (jwt.ClaimStrings, error) {
-	return nil, nil
-}
+func (a AccessClaims) GetAudience() (jwt.ClaimStrings, error) { return nil, nil }
 func (a AccessClaims) GetExpirationTime() (*jwt.NumericDate, error) {
-	return jwt.NewNumericDate(time.Now().Add(time.Second * time.Duration(a.Exp))), nil
+	return jwt.NewNumericDate(time.Unix(a.Exp, 0)), nil
 }
-func (a AccessClaims) GetIssuedAt() (*jwt.NumericDate, error) {
-	return nil, nil
-}
-func (a AccessClaims) GetIssuer() (string, error) {
-	return a.Iss, nil
-}
-func (a AccessClaims) GetNotBefore() (*jwt.NumericDate, error) {
-	return nil, nil
-}
-func (a AccessClaims) GetSubject() (string, error) {
-	return a.Sub, nil
-}
+func (a AccessClaims) GetIssuedAt() (*jwt.NumericDate, error)  { return nil, nil }
+func (a AccessClaims) GetIssuer() (string, error)              { return a.Iss, nil }
+func (a AccessClaims) GetNotBefore() (*jwt.NumericDate, error) { return nil, nil }
+func (a AccessClaims) GetSubject() (string, error)             { return a.Sub, nil }
 
-func (r RefreshClaims) GetAudience() (jwt.ClaimStrings, error) {
-	return nil, nil
-}
+func (r RefreshClaims) GetAudience() (jwt.ClaimStrings, error) { return nil, nil }
 func (r RefreshClaims) GetExpirationTime() (*jwt.NumericDate, error) {
-	return jwt.NewNumericDate(time.Now().Add(time.Second * time.Duration(r.Exp))), nil
+	return jwt.NewNumericDate(time.Unix(r.Exp, 0)), nil
 }
-func (r RefreshClaims) GetIssuedAt() (*jwt.NumericDate, error) {
-	return nil, nil
-}
-func (r RefreshClaims) GetIssuer() (string, error) {
-	return r.Iss, nil
-}
-func (r RefreshClaims) GetNotBefore() (*jwt.NumericDate, error) {
-	return nil, nil
-}
-func (r RefreshClaims) GetSubject() (string, error) {
-	return r.Sub, nil
-}
+func (r RefreshClaims) GetIssuedAt() (*jwt.NumericDate, error)  { return nil, nil }
+func (r RefreshClaims) GetIssuer() (string, error)              { return r.Iss, nil }
+func (r RefreshClaims) GetNotBefore() (*jwt.NumericDate, error) { return nil, nil }
+func (r RefreshClaims) GetSubject() (string, error)             { return r.Sub, nil }

@@ -20,6 +20,8 @@ struct InsertExprs<T> {
 
 union WhereCondition {
     WhereEq<String> eqStr;
+    // Void limit;
+    // Void offset;
 };
 
 struct WhereEq<T> {

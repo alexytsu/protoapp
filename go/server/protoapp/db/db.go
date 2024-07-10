@@ -4,7 +4,7 @@ package db
 import (
 	"github.com/adl-lang/goadl_common/common/db"
 	strings2 "github.com/adl-lang/goadl_common/common/strings"
-	"github.com/adl-lang/goadl_common/common/time"
+	"time"
 )
 
 type AppUser struct {
@@ -63,13 +63,13 @@ type Message struct {
 }
 
 type _Message struct {
-	Posted_at time.Instant      `json:"posted_at"`
+	Posted_at time.Time         `json:"posted_at"`
 	Posted_by AppUserId         `json:"posted_by"`
 	Message   strings2.StringML `json:"message"`
 }
 
 func MakeAll_Message(
-	posted_at time.Instant,
+	posted_at time.Time,
 	posted_by AppUserId,
 	message strings2.StringML,
 ) Message {
@@ -83,7 +83,7 @@ func MakeAll_Message(
 }
 
 func Make_Message(
-	posted_at time.Instant,
+	posted_at time.Time,
 	posted_by AppUserId,
 	message strings2.StringML,
 ) Message {

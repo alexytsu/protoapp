@@ -9,29 +9,12 @@ import (
 	goadl "github.com/adl-lang/goadl_rt/v3"
 )
 
-// func AdlPost[I any, O any](
-// 	serveMux *http.ServeMux,
-// 	post HttpPost[I, O],
-// 	fn func(I) O,
-// ) func(http.ResponseWriter, *http.Request) {
-// 	req_dec := goadl.CreateJsonDecodeBinding(post.ReqType, goadl.RESOLVER)
-// 	resp_enc := goadl.CreateJsonEncodeBinding(post.RespType, goadl.RESOLVER)
-// 	serveMux.HandleFunc(post.Path, func(w http.ResponseWriter, r *http.Request) {
-// 		var req I
-// 		err := req_dec.Decode(r.Body, &req)
-// 		if err != nil {
-// 			http.Error(w, fmt.Sprintf("error decoding body : %v", err), http.StatusUnprocessableEntity)
-// 			return
-// 		}
-// 		resp := fn(req)
-// 		err = resp_enc.Encode(w, resp)
-// 		if err != nil {
-// 			http.Error(w, fmt.Sprintf("error encoding body : %v", err), http.StatusUnprocessableEntity)
-// 			return
-// 		}
-// 	})
-// 	return nil
-// }
+type CONTEXT_KEY string
+
+const (
+	REQ_KEY  CONTEXT_KEY = "req"
+	RESP_KEY CONTEXT_KEY = "resp"
+)
 
 func AdlPost[I any, O any](
 	serveMux *http.ServeMux,
@@ -48,7 +31,10 @@ func AdlPost[I any, O any](
 			return
 		}
 
-		resp, err := fn(r.Context(), req)
+		resp, err := fn(
+			context.WithValue(context.WithValue(r.Context(), REQ_KEY, r), RESP_KEY, w),
+			req,
+		)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("error : %v", err), http.StatusInternalServerError)
 			return
@@ -61,19 +47,6 @@ func AdlPost[I any, O any](
 	})
 }
 
-// func AdlGet[O any](serveMux *http.ServeMux, get HttpGet[O], fn func() O) func(http.ResponseWriter, *http.Request) {
-// 	resp_enc := goadl.CreateJsonEncodeBinding(get.RespType, goadl.RESOLVER)
-// 	serveMux.HandleFunc(get.Path, func(w http.ResponseWriter, r *http.Request) {
-// 		resp := fn()
-// 		err := resp_enc.Encode(w, resp)
-// 		if err != nil {
-// 			http.Error(w, fmt.Sprintf("error encoding body : %v", err), http.StatusUnprocessableEntity)
-// 			return
-// 		}
-// 	})
-// 	return nil
-// }
-
 func AdlGet[O any](
 	serveMux *http.ServeMux,
 	endpoint HttpGet[O],
@@ -81,7 +54,9 @@ func AdlGet[O any](
 ) {
 	resp_enc := goadl.CreateJsonEncodeBinding(endpoint.RespType, goadl.RESOLVER)
 	serveMux.HandleFunc(endpoint.Path, func(w http.ResponseWriter, r *http.Request) {
-		resp, err := fn(r.Context())
+		resp, err := fn(
+			context.WithValue(context.WithValue(r.Context(), REQ_KEY, r), RESP_KEY, w),
+		)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("error : %v", err), http.StatusInternalServerError)
 			return

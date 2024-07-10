@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"github.com/adl-lang/goadl_common/common/http"
 	strings2 "github.com/adl-lang/goadl_common/common/strings"
-	"github.com/adl-lang/goadl_common/common/time"
 	"github.com/adl-lang/goadl_protoapp/protoapp/db"
 	"github.com/adl-lang/goadl_rt/v3/sys/adlast"
+	"time"
 )
 
 type ApiRequests struct {
@@ -426,14 +426,14 @@ type Message struct {
 
 type _Message struct {
 	Id            db.MessageId      `json:"id"`
-	Posted_at     time.Instant      `json:"posted_at"`
+	Posted_at     time.Time         `json:"posted_at"`
 	User_fullname string            `json:"user_fullname"`
 	Message       strings2.StringML `json:"message"`
 }
 
 func MakeAll_Message(
 	id db.MessageId,
-	posted_at time.Instant,
+	posted_at time.Time,
 	user_fullname string,
 	message strings2.StringML,
 ) Message {
@@ -449,7 +449,7 @@ func MakeAll_Message(
 
 func Make_Message(
 	id db.MessageId,
-	posted_at time.Instant,
+	posted_at time.Time,
 	user_fullname string,
 	message strings2.StringML,
 ) Message {

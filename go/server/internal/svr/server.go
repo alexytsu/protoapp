@@ -70,6 +70,12 @@ func (sc *srvCmd) Run() error {
 		tokenApi: &tokenSvr{
 			db: db,
 		},
+		refreshApi: &refreshSvr{
+			db:              db,
+			refresh_tokener: sc.Cfg,
+			access_tokener:  sc.Cfg,
+			// tokener: sc.Cfg,
+		},
 	}
 	acr := &accessTokenCapr{
 		tokener: sc.Cfg,

@@ -2,6 +2,8 @@ module github.com/adl-lang/goadl_protoapp
 
 go 1.22.1
 
+replace github.com/adl-lang/goadl_rt/v3 => /Users/garym/devel/adl/goadl/goadl_rt/v3
+
 require (
 	github.com/golang-jwt/jwt/v5 v5.2.1 // indirect
 	github.com/jmoiron/sqlx v1.4.0 // indirect

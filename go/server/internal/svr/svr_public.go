@@ -3,8 +3,10 @@ package svr
 import (
 	"context"
 	"fmt"
+	http2 "net/http"
 	"os"
 
+	"github.com/adl-lang/goadl_common/common/capability"
 	"github.com/adl-lang/goadl_common/common/db"
 	"github.com/adl-lang/goadl_common/common/hashing"
 	"github.com/adl-lang/goadl_common/common/http"
@@ -14,6 +16,8 @@ import (
 	db2 "github.com/adl-lang/goadl_protoapp/protoapp/db"
 	"github.com/jmoiron/sqlx"
 )
+
+const REFRESH_TOKEN = "refreshToken"
 
 type publicSvr struct {
 	db         *sqlx.DB
@@ -34,8 +38,21 @@ func (ps *publicSvr) GetRefreshTokenApi() cap.RefreshApiRequests_Service[string,
 }
 
 // Healthy implements cap.ApiRequests_Service.
-func (p *publicSvr) Healthy(ctx context.Context) (http.Unit, error) {
-	panic("unimplemented")
+func (ps *publicSvr) Healthy(ctx context.Context) (http.Unit, error) {
+	err := ps.db.Ping()
+	if err != nil {
+		return http.Unit{}, err
+	}
+	return http.Make_Unit(), nil
+}
+
+// Ping implements cap.ApiRequests_Service.
+func (ps *publicSvr) Ping(ctx context.Context, req http.Unit) (http.Unit, error) {
+	err := ps.db.Ping()
+	if err != nil {
+		return http.Unit{}, err
+	}
+	return http.Make_Unit(), nil
 }
 
 // Login implements cap.ApiRequests_Service.
@@ -79,22 +96,24 @@ func (ps *publicSvr) Login(ctx context.Context, req cap.LoginReq) (cap.LoginResp
 		fmt.Printf("error signing refresh token: %v\n", err)
 		return cap.Make_LoginResp_invalid_credentials(), nil
 	}
-	// // token, err := createToken(user.Id, roles)
-	// if err != nil {
-	// 	fmt.Printf("error signing token: %v\n", err)
-	// 	return cap.Make_LoginResp_invalid_credentials(), nil
-	// }
+	hw := ctx.Value(capability.RESP_KEY).(http2.ResponseWriter)
+	http2.SetCookie(hw, &http2.Cookie{
+		Name:     REFRESH_TOKEN,
+		Value:    refreshtoken,
+		HttpOnly: true,
+	})
 	return cap.Make_LoginResp_tokens(cap.Make_LoginTokens(accesstoken, refreshtoken)), nil
 }
 
 // Logout implements cap.ApiRequests_Service.
 func (p *publicSvr) Logout(ctx context.Context, req http.Unit) (http.Unit, error) {
-	panic("unimplemented")
-}
-
-// Ping implements cap.ApiRequests_Service.
-func (p *publicSvr) Ping(ctx context.Context, req http.Unit) (http.Unit, error) {
-	panic("unimplemented")
+	hw := ctx.Value(capability.RESP_KEY).(http2.ResponseWriter)
+	http2.SetCookie(hw, &http2.Cookie{
+		Name:     REFRESH_TOKEN,
+		HttpOnly: true,
+		MaxAge:   -1,
+	})
+	return http.Make_Unit(), nil
 }
 
 var _ cap.ApiRequests_Service = &publicSvr{}

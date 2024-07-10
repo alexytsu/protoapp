@@ -237,12 +237,4 @@ func HandleWithErr_DayOfWeek[T any](
 
 type Duration string
 
-type Instant int64
-
-type LocalDate string
-
-type LocalDateTime string
-
-type LocalTime string
-
 type Timezone strings2.StringNE
