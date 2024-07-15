@@ -3,6 +3,8 @@ package svr
 import (
 	"fmt"
 	"net/http"
+	"os"
+	"strings"
 	"time"
 
 	"github.com/adl-lang/goadl_common/common/capability"
@@ -23,11 +25,20 @@ var _ capability.CapabilityRetriever[cap.RefreshToken, http2.Unit] = &refreshTok
 
 // Retrieve implements service.CapabilityRetriever.
 func (capr *accessTokenCapr) Retrieve(req *http.Request) (cp cap.Capability, token string, err error) {
-	token = req.Header.Get("X-Auth-Token")
+	token = req.Header.Get("Authorization")
 	if token == "" {
-		return cp, token, fmt.Errorf("X-Auth-Token not found")
+		return cp, token, fmt.Errorf("authorization not found")
 	}
-	claims, err := capr.tokener.ParseAccessToken(token)
+	parts := strings.Split(token, " ")
+	if len(parts) != 2 {
+		fmt.Fprintf(os.Stderr, "Authorization header bad format '%s'\n", token)
+		return cp, token, fmt.Errorf("authorization not found")
+	}
+	if strings.ToLower(parts[0]) != "bearer" {
+		fmt.Fprintf(os.Stderr, "Authorization header bad format '%s'\n", token)
+		return cp, token, fmt.Errorf("authorization not found")
+	}
+	claims, err := capr.tokener.ParseAccessToken(parts[1])
 	if err != nil {
 		return cp, token, err
 	}
