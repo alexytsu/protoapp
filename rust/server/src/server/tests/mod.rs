@@ -1,13 +1,13 @@
-use crate::adl::gen::common::http::Unit;
-use crate::adl::gen::protoapp::apis;
-use crate::adl::gen::protoapp::apis::ui::{
-    LoginReq, LoginTokens, Message, PageReq, Paginated, RefreshReq,
-};
 use crate::server::tests::helpers::{
     create_test_user, login_user, server_auth_req, server_public_req, server_req,
     test_server_config, DbTestEnv,
 };
 use crate::server::{AppState, OServer};
+use shared::adl::gen::common::http::Unit;
+use shared::adl::gen::protoapp::apis;
+use shared::adl::gen::protoapp::apis::ui::{
+    LoginReq, LoginTokens, Message, PageReq, Paginated, RefreshReq,
+};
 
 mod helpers;
 

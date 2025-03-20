@@ -55,9 +55,9 @@ async function main() {
 
   {
     //----------------------------------------------------------------------
-    // Generate rust for the protoapp server
+    // Generate rust for the shared crate that can be used by multiple consumers
     
-    const outputDir = repo + "/rust/server/src";
+    const outputDir = repo + "/rust/shared/src";
     await genRust({
       ...commonFlags,
       adlModules: [
@@ -72,7 +72,6 @@ async function main() {
       manifest: outputDir + "/.adl-manifest",
       generateTransitive: true,
     });
-
 
     await genRustSeaQuerySchema({
       ...commonFlags,

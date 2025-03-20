@@ -1,7 +1,7 @@
 use poem::endpoint::{DynEndpoint, ToDynEndpoint};
 use poem::{post, EndpointExt, Route};
 
-use crate::adl::gen::protoapp::apis::ui::ApiRequests;
+use shared::adl::gen::protoapp::apis::ui::ApiRequests;
 
 use super::handlers;
 use super::poem_adl_interop::{new_access_token_checker, RouteExt};

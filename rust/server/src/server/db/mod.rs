@@ -4,7 +4,7 @@ use sea_query::{Expr, Func, Order, PostgresQueryBuilder, Query};
 use sea_query_binder::SqlxBinder;
 use sqlx::Row;
 
-use crate::adl::{
+use shared::adl::{
     custom::common::{db::DbKey, time::Instant},
     db::{
         schema,

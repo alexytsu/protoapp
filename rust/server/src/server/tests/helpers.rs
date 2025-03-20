@@ -5,11 +5,11 @@ use serde::Serialize;
 use sqlx::postgres::PgPoolOptions;
 use sqlx::Executor;
 
-use crate::adl::gen::common::http::{HttpMethod, HttpReq};
-use crate::adl::gen::protoapp::apis;
-use crate::adl::gen::protoapp::apis::ui::LoginReq;
-use crate::adl::gen::protoapp::config::server::{DbConnectionConfig, ServerConfig};
 use crate::server::passwords::hash_password;
+use shared::adl::gen::common::http::{HttpMethod, HttpReq};
+use shared::adl::gen::protoapp::apis;
+use shared::adl::gen::protoapp::apis::ui::LoginReq;
+use shared::adl::gen::protoapp::config::server::{DbConnectionConfig, ServerConfig};
 
 pub struct DbTestEnv {
     pub pool: sqlx::PgPool,
@@ -114,7 +114,7 @@ pub async fn server_req<I: Serialize, O: DeserializeOwned>(
             HeaderValue::from_str(&format!("Bearer {}", jwt)).unwrap(),
         );
     }
-    let resp = match endpoint.method {
+    match endpoint.method {
         HttpMethod::Get => client
             .get(format!(
                 "http://localhost:8181{}{}",
@@ -132,8 +132,7 @@ pub async fn server_req<I: Serialize, O: DeserializeOwned>(
             .send()
             .await
             .unwrap(),
-    };
-    resp
+    }
 }
 
 pub fn encode_query_string<I: Serialize>(i: &I) -> String {
