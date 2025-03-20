@@ -80,7 +80,7 @@ pub fn decode_refresh(jwt_secret: &str, jwt: &str) -> anyhow::Result<RefreshClai
 
 pub fn bearer_token_from_auth_header(auth_header: &str) -> Option<String> {
     let fields: Vec<&str> = auth_header.split_ascii_whitespace().collect();
-    if fields.len() == 2 && *fields.first()?.to_lowercase() == "bearer".to_owned() {
+    if fields.len() == 2 && &fields.first()?.to_lowercase() == "bearer" {
         let token = *fields.get(1)?;
         return Some(token.to_owned());
     }
