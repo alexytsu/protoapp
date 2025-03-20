@@ -1,3 +1,5 @@
+#![allow(clippy::all)]
+
 #[rustfmt::skip]
 #[allow(dead_code)]
 pub mod gen;
