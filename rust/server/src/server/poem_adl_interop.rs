@@ -8,8 +8,8 @@ use std::future::Future;
 use std::marker::PhantomData;
 use std::sync::Arc;
 
-use crate::adl::gen::common::http::HttpSecurity;
-use crate::adl::gen::common::http::{HttpGet, HttpPost};
+use shared::adl::gen::common::http::HttpSecurity;
+use shared::adl::gen::common::http::{HttpGet, HttpPost};
 
 use super::jwt;
 

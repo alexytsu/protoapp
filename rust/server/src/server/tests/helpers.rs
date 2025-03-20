@@ -4,11 +4,11 @@ use serde::Serialize;
 use sqlx::postgres::PgPoolOptions;
 use sqlx::Executor;
 
-use crate::adl::gen::common::http::{HttpGet, HttpPost};
-use crate::adl::gen::protoapp::apis;
-use crate::adl::gen::protoapp::apis::ui::LoginReq;
-use crate::adl::gen::protoapp::config::server::{DbConnectionConfig, ServerConfig};
 use crate::server::passwords::hash_password;
+use shared::adl::gen::common::http::{HttpGet, HttpPost};
+use shared::adl::gen::protoapp::apis;
+use shared::adl::gen::protoapp::apis::ui::LoginReq;
+use shared::adl::gen::protoapp::config::server::{DbConnectionConfig, ServerConfig};
 
 pub struct DbTestEnv {
     pub pool: sqlx::PgPool,
@@ -111,7 +111,7 @@ pub async fn server_auth_request1<I: Serialize, O: DeserializeOwned>(
     req: &I,
 ) -> reqwest::Response {
     let client = reqwest::Client::new();
-    
+
     client
         .post(format!("http://localhost:8181{}", endpoint.path))
         .header("Authorization", format!("Bearer {}", jwt))

@@ -1,8 +1,8 @@
 use clap::Parser;
 use std::path::PathBuf;
 
-use protoapp::adl::gen::protoapp::config::server::ServerConfig;
 use protoapp::server;
+use shared::adl::gen::protoapp::config::server::ServerConfig;
 
 #[tokio::main]
 async fn main() {
