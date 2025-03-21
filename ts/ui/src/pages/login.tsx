@@ -1,80 +1,117 @@
-import Container from '@mui/material/Container';
-import Typography from '@mui/material/Typography';
-import Box from '@mui/material/Box';
-import { useTypedFieldState } from '@/components/forms/model/fields/hooks';
-import { EMAIL_FIELD, NON_EMPTY_STRING_FIELD } from '@/components/forms/model/fields/primitive';
-import { TextField } from '@mui/material';
-import { AsyncLoadingButton } from '@/components/Button';
-import { useAppState } from '@/hooks/use-app-state';
-import { useState } from 'react';
-import { useNavigate } from 'raviger';
-import { messagesUrl } from '@/navigation';
+import { useState } from "react";
+import { useNavigate } from "react-router";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useAppState } from "@/hooks/use-app-state/context";
+import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
+const formSchema = z.object({
+  email: z.string().email("Please enter a valid email"),
+  password: z.string().min(1, "Password is required"),
+});
+
+type FormValues = z.infer<typeof formSchema>;
 
 export function Login() {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const appState = useAppState();
-  const email = useTypedFieldState(EMAIL_FIELD);
-  const password = useTypedFieldState(NON_EMPTY_STRING_FIELD);
-  const [showErrors, setShowErrors] = useState(false);
-  const formValid = email.isValid() && password.isValid();
+  const [isLoading, setIsLoading] = useState(false);
 
-  async function onLogin() {
-    if (formValid) {
-      const resp = await appState.api.login({email: email.value(), password: password.value()});
+  const form = useForm<FormValues>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
+
+  async function onSubmit(values: FormValues) {
+    setIsLoading(true);
+    try {
+      const resp = await appState.api.login({
+        email: values.email,
+        password: values.password,
+      });
+
       appState.setAuthStateFromLogin(resp);
-      if (resp.kind === 'tokens') {
-        navigate(messagesUrl());
+
+      if (resp.kind === "tokens") {
+        await navigate("/messages");
       }
-    } else {
-      setShowErrors(true);
+    } finally {
+      setIsLoading(false);
     }
   }
 
   return (
-    <Container maxWidth="sm">
-      <Box sx={{ my: 4 }}>
-        <Typography variant="h4" component="h1" sx={{ mb: 2 }}>
-          Login
-        </Typography>
+    <div className="container max-w-sm mx-auto my-8">
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-2xl">Login</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="your@email.com"
+                        type="email"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-        <TextField
-          label="Email"
-          required
-          variant="outlined"
-          color="secondary"
-          type="email"
-          sx={{ mb: 3 }}
-          fullWidth
-          onChange={e => email.setText(e.target.value)}
-          value={email.text}
-          error={showErrors && !email.isValid()}
-          helperText={showErrors && email.validationError()}
-        />
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Password</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="password"
+                        type="password"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-        <TextField
-          label="Password"
-          required
-          variant="outlined"
-          color="secondary"
-          type="password"
-          onChange={e => password.setText(e.target.value)}
-          value={password.text}
-          error={showErrors && !password.isValid()}
-          helperText={showErrors && password.validationError()}
-          fullWidth
-          sx={{ mb: 3 }}
-        />      
+              {appState.authState.kind === "authfailed" && (
+                <div className="text-red-500 text-sm">
+                  Incorrect username/password.
+                </div>
+              )}
 
-        {appState.authState.kind === 'authfailed' && 
-          <Box sx={{marginBottom: "15px", color: 'red'}}>
-            Incorrect username/password.
-          </Box>
-        }
-
-        <AsyncLoadingButton variant="contained" onClick={onLogin}>
-          Login
-        </AsyncLoadingButton>
-      </Box>
-    </Container>
+              <Button type="submit" className="w-full" disabled={isLoading}>
+                {isLoading ? "Logging in..." : "Login"}
+              </Button>
+            </form>
+          </Form>
+        </CardContent>
+      </Card>
+    </div>
   );
 }

@@ -1,17 +1,35 @@
-import { useAppState } from '@/hooks/use-app-state';
-import { Redirect } from 'raviger';
+import { Link } from "react-router";
+import { Button } from "@/components/ui/button";
+import { useAppState } from "@/hooks/use-app-state/context";
 
 export function Landing() {
-  const appState = useAppState();
-  
-  // Once we know whether we are logged in or not,
-  // redirect to the the appropriate page
-  switch (appState.authState.kind) {
-    case 'loading':
-      return <div />;
-    case 'auth':
-      return <Redirect to='/messages' />;
-    default:
-      return <Redirect to='/login' />;
-  }
+  const { authState } = useAppState();
+  const isLoggedIn = authState.kind === "auth";
+
+  return (
+    <div className="flex flex-col items-center justify-center min-h-svh p-4">
+      <h1 className="text-4xl font-bold mb-6">Welcome to ProtoApp</h1>
+      <p className="text-xl mb-8 text-center max-w-xl">
+        A prototype application with authentication and API workbench
+        capabilities.
+      </p>
+
+      <div className="flex gap-4">
+        {isLoggedIn ? (
+          <>
+            <Button asChild className="px-6">
+              <Link to="/messages">Messages</Link>
+            </Button>
+            <Button asChild variant="ghost" className="px-6">
+              <Link to="/logout">Logout</Link>
+            </Button>
+          </>
+        ) : (
+          <Button asChild className="px-8">
+            <Link to="/login">Login</Link>
+          </Button>
+        )}
+      </div>
+    </div>
+  );
 }

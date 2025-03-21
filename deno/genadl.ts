@@ -14,8 +14,28 @@ async function main() {
 
   {
     //----------------------------------------------------------------------
-    // Generate typescript for the protoapp ui
+    // Generate typescript for the api workbench ui
     
+    const outputDir = repo + "/ts/api-workbench/src/adl-gen";
+    await genTypescript({
+      ...commonFlags,
+      adlModules: [
+        "protoapp.apis.ui",
+        "sys.adlast",
+        "common.ui",
+      ],
+      tsStyle: "tsc",
+      outputDir: outputDir,
+      includeResolver: true,
+      manifest: outputDir + "/.adl-manifest",
+      generateTransitive: true,
+      excludeAstAnnotations: [],
+    });
+  }
+
+  {
+    //----------------------------------------------------------------------
+    // Generate typescript for the protoapp ui
     const outputDir = repo + "/ts/ui/src/adl-gen";
     await genTypescript({
       ...commonFlags,

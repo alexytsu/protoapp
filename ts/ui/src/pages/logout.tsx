@@ -1,24 +1,32 @@
-import Container from '@mui/material/Container';
-import Typography from '@mui/material/Typography';
-import Box from '@mui/material/Box';
-import { useAppState } from '@/hooks/use-app-state';
-import { useEffect } from 'react';
+import { useEffect } from "react";
+import { useAppState } from "@/hooks/use-app-state/context";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useNavigate } from "react-router";
 
 export function Logout() {
+  const appState = useAppState();
+  const navigate = useNavigate();
 
-  const appState =useAppState();
+  useEffect(() => {
+    void appState.logout();
+  }, [appState]);
 
-  useEffect( () => {
-    appState.logout();
-  }, []);
+  useEffect(() => {
+    setTimeout(() => {
+      void navigate("/login");
+    }, 1500);
+  }, [navigate]);
 
   return (
-    <Container maxWidth="sm">
-      <Box sx={{ my: 4 }}>
-        <Typography variant="h4" component="h1" sx={{ mb: 2 }}>
-          Logout
-        </Typography>
-      </Box>
-    </Container>
+    <div className="container max-w-sm mx-auto my-8">
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-2xl">Logout</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p>You have been logged out successfully.</p>
+        </CardContent>
+      </Card>
+    </div>
   );
 }

@@ -1,39 +1,33 @@
-# Material UI - Vite.js in TypeScript example
+# ProtoApp UI
 
-## How to use
+This is the primary user-facing application for ProtoApp. It provides a modern, responsive interface built with React, TypeScript, and TailwindCSS.
 
-Download the example [or clone the repo](https://github.com/mui/material-ui):
+## Features
 
-<!-- #default-branch-switch -->
+- User authentication (login/logout)
+- Messaging system
+- Modern UI with responsive design
+
+## Development
+
+To start the development server:
 
 ```bash
-curl https://codeload.github.com/mui/material-ui/tar.gz/master | tar -xz --strip=2 material-ui-master/examples/material-ui-vite-ts
-cd material-ui-vite-ts
-```
-
-Install it and run:
-
-```bash
+cd ts/ui
 npm install
 npm run dev
 ```
 
-or:
+The application will be available at http://localhost:5173
 
-<!-- #default-branch-switch -->
+## Building for Production
 
-[![Edit on StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/mui/material-ui/tree/master/examples/material-ui-vite-ts)
+```bash
+npm run build
+```
 
-[![Edit on CodeSandbox](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/p/sandbox/github/mui/material-ui/tree/master/examples/material-ui-vite-ts)
+This will create optimized production files in the `dist` directory.
 
-## The idea behind the example
+## Note
 
-This example uses [Vite.js](https://github.com/vitejs/vite).
-It includes `@mui/material` and its peer dependencies, including [Emotion](https://emotion.sh/docs/introduction), the default style engine in Material UI v5.
-
-## What's next?
-
-<!-- #default-branch-switch -->
-
-You now have a working example project.
-You can head back to the documentation and continue by browsing the [templates](https://mui.com/material-ui/getting-started/templates/) section.
+The API Workbench application (in `ts/api-workbench`) is now deprecated for user-facing features and should only be used for internal API testing.

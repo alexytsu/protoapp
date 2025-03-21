@@ -4,15 +4,12 @@ import { HttpReq } from "@/adl-gen/common/http";
 import { createJsonBinding, Json, JsonBinding } from "@adllang/adl-runtime";
 import { QueryStats } from "@mui/icons-material";
 
-
 export class ServiceBase {
-
   constructor(
     private readonly http: HttpFetch,
     private readonly baseUrl: string,
     private readonly resolver: ADL.DeclResolver,
-  ) {
-  }
+  ) {}
 
   mkReqFn<I, O>(rtype: HttpReq<I, O>): ReqFn<I, O> {
     const bb = createBiBinding<I, O>(this.resolver, rtype);
@@ -29,7 +26,7 @@ export class ServiceBase {
 
   mkAuthReqFn<I, O>(rtype: HttpReq<I, O>): AuthReqFn<I, O> {
     const bb = createBiBinding<I, O>(this.resolver, rtype);
-    return (authToken:string, req: I) => {
+    return (authToken: string, req: I) => {
       const jsonArgs = bb.reqJB.toJson(req);
       if (rtype.method === 'get') {
           const queryString = encodeQueryString(jsonArgs);
@@ -66,22 +63,26 @@ export class ServiceBase {
 
     // Check for errors
     if (!resp.ok) {
-      throw new AdlRequestError(
-        httpReq, resp.status, await resp.text()
-      );
+      throw new AdlRequestError(httpReq, resp.status, await resp.text());
     }
 
     // Parse and response
     const respJson = await resp.json();
-    return respJB.fromJsonE(respJson);
+    return respJB.fromJsonE(respJson as ADL.Json);
   }
 }
 
 export class AdlRequestError extends Error {
-  constructor(readonly httpReq: HttpRequest, readonly respStatus: number, readonly respBody: string) {
-    super(`Encountered server error attempting ${httpReq.method} request to ${httpReq.url} failed: ${respStatus}`)
+  constructor(
+    readonly httpReq: HttpRequest,
+    readonly respStatus: number,
+    readonly respBody: string,
+  ) {
+    super(
+      `Encountered server error attempting ${httpReq.method} request to ${httpReq.url} failed: ${respStatus}`,
+    );
   }
-} 
+}
 
 export function encodeQueryString(reqJson: Json) {
   return reqJson === null ? undefined : `input=${encodeURIComponent(JSON.stringify(reqJson))}`;
@@ -100,9 +101,12 @@ interface BiBinding<I, O> {
   respJB: JsonBinding<O>;
 }
 
-function createBiBinding<I, O>(resolver: ADL.DeclResolver, rtype: BiTypeExpr<I, O>): BiBinding<I, O> {
+function createBiBinding<I, O>(
+  resolver: ADL.DeclResolver,
+  rtype: BiTypeExpr<I, O>,
+): BiBinding<I, O> {
   return {
     reqJB: createJsonBinding(resolver, rtype.reqType),
-    respJB: createJsonBinding(resolver, rtype.respType)
+    respJB: createJsonBinding(resolver, rtype.respType),
   };
 }

@@ -10,7 +10,7 @@ export const ROUTES = {
   '/login': () => <Login />,
   '/logout': () => <Logout/>,
   '/messages': () => <RequireLogin><Messages/></RequireLogin>,
-  '/api-workbench': () =><ApiWorkbench/>,
+  '/api-workbench': () => <RequireLogin><ApiWorkbench/></RequireLogin>,
 };
 
 

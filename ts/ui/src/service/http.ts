@@ -18,5 +18,5 @@ export interface HttpResponse {
   statusText: string;
   ok: boolean;
   text(): Promise<string>;
-  json(): Promise<{} | null>;
+  json(): Promise<object | null>;
 }

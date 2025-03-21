@@ -1,80 +1,135 @@
-import Container from '@mui/material/Container';
-import Typography from '@mui/material/Typography';
-import Box from '@mui/material/Box';
-import { useApiWithToken } from '@/hooks/use-app-state';
-import { useAsyncLoad } from '@/hooks/use-async-result';
-import { NON_EMPTY_MULTILINE_STRING_FIELD } from '@/components/forms/model/fields/primitive';
-import { useTypedFieldState } from '@/components/forms/model/fields/hooks';
-import { Card, CardContent, TextField } from '@mui/material';
-import { useState } from 'react';
-import { AsyncLoadingButton } from '@/components/Button';
+import { useCallback, useEffect, useState } from "react";
+import { useApiWithToken } from "@/hooks/use-app-state/context";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+} from "@/components/ui/form";
+
+const messageSchema = z.object({
+  message: z.string().min(1, "Message is required"),
+});
+
+type MessageFormValues = z.infer<typeof messageSchema>;
+
+interface Message {
+  message: string;
+  user_fullname: string;
+  posted_at: number;
+}
 
 export function Messages() {
-
   const { api, jwt } = useApiWithToken();
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const [messages, reloadMessages] = useAsyncLoad(
-    () => api.recent_messages(jwt, {page: { offset: 0, limit: 10 }}),
-    [api, jwt]
-  );
-  const message = useTypedFieldState(NON_EMPTY_MULTILINE_STRING_FIELD);;
-  const [showErrors, setShowErrors] = useState(false);
+  const form = useForm<MessageFormValues>({
+    resolver: zodResolver(messageSchema),
+    defaultValues: {
+      message: "",
+    },
+  });
 
-  async function onPost() {
-    if (message.isValid()) {
-      setShowErrors(false);
-      await api.new_message(jwt, { message: message.value() });
-      message.setText("");
-      reloadMessages()
-    } else {
-      setShowErrors(true);
+  const loadMessages = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const response = await api.recent_messages(jwt, {
+        page: { offset: 0, limit: 10 },
+      });
+      setMessages(response.items);
+    } finally {
+      setIsLoading(false);
     }
+  }, [api, jwt]);
+
+  useEffect(() => {
+    void loadMessages();
+  }, [loadMessages]);
+
+  async function onSubmit(values: MessageFormValues) {
+    await api.new_message(jwt, { message: values.message });
+    form.reset();
+    await loadMessages();
   }
 
-  let renderedMessages = messages.state == 'loading' ? [] :
-    messages.value.items.map((m,i) => {
-      const posted_at = new Date(m.posted_at);
-      return (
-        <Card variant="outlined" sx={{ marginBottom: "10px" }} key={i}>
-          <CardContent>
-            <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-              <b>{m.user_fullname}</b> ({posted_at.toLocaleDateString()} {posted_at.toLocaleTimeString()})
-            </Typography>
-            <Box sx={{whiteSpace: "pre-wrap"}}>
-            {m.message}
-            </Box>
-          </CardContent>
-        </Card>
-      )
-    });
-  renderedMessages.reverse();
-
   return (
-    <Container maxWidth="sm">
-      <Box sx={{ my: 4 }}>
-        <Typography variant="h4" component="h1" sx={{ mb: 2 }}>
-          Messages
-        </Typography>
-        {renderedMessages}
-        <TextField
-          label="New message"
-          required
-          variant="outlined"
-          color="secondary"
-          multiline
-          sx={{ mb: 3 }}
-          fullWidth
-          rows={4}
-          onChange={e => message.setText(e.target.value)}
-          value={message.text}
-          error={showErrors && !message.isValid()}
-          helperText={showErrors && message.validationError()}
-        />
-
-        <AsyncLoadingButton variant="contained" onClick={onPost}>
-          Post
-        </AsyncLoadingButton>
-      </Box>
-    </Container>
+    <div className="p-8 flex flex-col w-full gap-8">
+      <h1 className="text-2xl font-bold">Messages</h1>
+      <Card className="max-w-2xl">
+        <CardHeader>
+          <CardTitle>Post a New Message</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Form {...form}>
+            <form
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="space-y-4 flex flex-col"
+            >
+              <FormField
+                control={form.control}
+                name="message"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <Textarea
+                        placeholder="Write your message here..."
+                        className="min-h-32"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <Button
+                className="self-end"
+                type="submit"
+                size="sm"
+                disabled={isLoading}
+              >
+                Post Message
+              </Button>
+            </form>
+          </Form>
+        </CardContent>
+      </Card>
+      {isLoading ? (
+        <div className="text-center py-4">Loading messages...</div>
+      ) : messages.length === 0 ? (
+        <div className="text-center py-4">No messages yet</div>
+      ) : (
+        <div className="space-y-4 max-w-2xl">
+          {[...messages].reverse().map((message) => {
+            const postedAt = new Date(message.posted_at);
+            return (
+              <Card key={message.user_fullname + message.posted_at}>
+                <CardHeader>
+                  <CardTitle className="flex justify-between items-center text-sm">
+                    <div className="flex items-center gap-2">
+                      {message.user_fullname}
+                    </div>
+                    <div className="italic text-muted-foreground font-normal">
+                      {postedAt.toLocaleDateString()}{" "}
+                      {postedAt.toLocaleTimeString()}
+                    </div>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="whitespace-pre-wrap">{message.message}</div>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
+      )}
+    </div>
   );
 }
