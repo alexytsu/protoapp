@@ -3,14 +3,10 @@ import * as API from "@/adl-gen/protoapp/apis/ui";
 import { ServiceBase } from "./service-base";
 import { RESOLVER } from "../adl-gen/resolver";
 
-
 const api = API.makeApiRequests({});
 
 export class Service extends ServiceBase {
-  constructor(
-    http: HttpFetch,
-    baseUrl: string,
-  ) {
+  constructor(http: HttpFetch, baseUrl: string) {
     super(http, baseUrl, RESOLVER);
   }
 
@@ -21,4 +17,4 @@ export class Service extends ServiceBase {
   new_message = this.mkAuthPostFn(api.new_message);
   recent_messages = this.mkAuthPostFn(api.recent_messages);
   who_am_i = this.mkAuthGetFn(api.who_am_i);
-};
+}

@@ -3,44 +3,52 @@ import * as ADL from "@adllang/adl-runtime";
 import { HttpGet, HttpPost } from "@/adl-gen/common/http";
 import { createJsonBinding, JsonBinding } from "@adllang/adl-runtime";
 
-
 export class ServiceBase {
-
   constructor(
     private readonly http: HttpFetch,
     private readonly baseUrl: string,
     private readonly resolver: ADL.DeclResolver,
-  ) {
-  }
+  ) {}
 
   mkPostFn<I, O>(rtype: HttpPost<I, O>): ReqFn<I, O> {
     const bb = createBiBinding<I, O>(this.resolver, rtype);
     return (req: I) => {
       const jsonArgs = bb.reqJB.toJson(req);
-      return this.requestAdl("post", rtype.path, jsonArgs, bb.respJB, undefined);
+      return this.requestAdl(
+        "post",
+        rtype.path,
+        jsonArgs,
+        bb.respJB,
+        undefined,
+      );
     };
   }
 
   mkAuthPostFn<I, O>(rtype: HttpPost<I, O>): AuthReqFn<I, O> {
     const bb = createBiBinding<I, O>(this.resolver, rtype);
-    return (authToken:string, req: I) => {
+    return (authToken: string, req: I) => {
       const jsonArgs = bb.reqJB.toJson(req);
-      return this.requestAdl("post", rtype.path, jsonArgs, bb.respJB, authToken);
+      return this.requestAdl(
+        "post",
+        rtype.path,
+        jsonArgs,
+        bb.respJB,
+        authToken,
+      );
     };
   }
 
-  mkAuthGetFn<I, O>(rtype: HttpGet<O>): AuthGetFn<O> {
+  mkAuthGetFn<O>(rtype: HttpGet<O>): AuthGetFn<O> {
     const jb = createJsonBinding<O>(this.resolver, rtype.respType);
-    return (authToken:string) => {
+    return (authToken: string) => {
       return this.requestAdl("get", rtype.path, null, jb, authToken);
     };
   }
 
-
   async requestAdl<O>(
     method: "get" | "post",
     path: string,
-    jsonArgs: {} | null,
+    jsonArgs: ADL.Json | null,
     respJB: JsonBinding<O>,
     authToken: string | undefined,
   ): Promise<O> {
@@ -54,7 +62,7 @@ export class ServiceBase {
       url: this.baseUrl + path,
       headers,
       method,
-      body: jsonArgs ? JSON.stringify(jsonArgs) : undefined
+      body: jsonArgs ? JSON.stringify(jsonArgs) : undefined,
     };
 
     // Make request
@@ -62,22 +70,26 @@ export class ServiceBase {
 
     // Check for errors
     if (!resp.ok) {
-      throw new AdlRequestError(
-        httpReq, resp.status, await resp.text()
-      );
+      throw new AdlRequestError(httpReq, resp.status, await resp.text());
     }
 
     // Parse and response
     const respJson = await resp.json();
-    return respJB.fromJsonE(respJson);
+    return respJB.fromJsonE(respJson as ADL.Json);
   }
 }
 
 export class AdlRequestError extends Error {
-  constructor(readonly httpReq: HttpRequest, readonly respStatus: number, readonly respBody: string) {
-    super(`Encountered server error attempting ${httpReq.method} request to ${httpReq.url} failed: ${respStatus}`)
+  constructor(
+    readonly httpReq: HttpRequest,
+    readonly respStatus: number,
+    readonly respBody: string,
+  ) {
+    super(
+      `Encountered server error attempting ${httpReq.method} request to ${httpReq.url} failed: ${respStatus}`,
+    );
   }
-} 
+}
 
 export type ReqFn<I, O> = (req: I) => Promise<O>;
 
@@ -94,9 +106,12 @@ interface BiBinding<I, O> {
   respJB: JsonBinding<O>;
 }
 
-function createBiBinding<I, O>(resolver: ADL.DeclResolver, rtype: BiTypeExpr<I, O>): BiBinding<I, O> {
+function createBiBinding<I, O>(
+  resolver: ADL.DeclResolver,
+  rtype: BiTypeExpr<I, O>,
+): BiBinding<I, O> {
   return {
     reqJB: createJsonBinding(resolver, rtype.reqType),
-    respJB: createJsonBinding(resolver, rtype.respType)
+    respJB: createJsonBinding(resolver, rtype.respType),
   };
 }
