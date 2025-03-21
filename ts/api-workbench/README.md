@@ -1,39 +1,33 @@
-# Material UI - Vite.js in TypeScript example
+# API Workbench
 
-## How to use
+## DEPRECATED FOR USER-FACING FEATURES
 
-Download the example [or clone the repo](https://github.com/mui/material-ui):
+This application is now intended for internal API testing only. User-facing features have been moved to the main UI application in `ts/ui`.
 
-<!-- #default-branch-switch -->
+## Purpose
+
+The API Workbench provides a developer-focused interface for testing and debugging the ProtoApp API endpoints. It allows:
+
+- Testing various API endpoints
+- Viewing request/response payloads
+- Authentication testing
+
+## Development
 
 ```bash
-curl https://codeload.github.com/mui/material-ui/tar.gz/master | tar -xz --strip=2 material-ui-master/examples/material-ui-vite-ts
-cd material-ui-vite-ts
-```
-
-Install it and run:
-
-```bash
+cd ts/api-workbench
 npm install
 npm run dev
 ```
 
-or:
+The application will be available at http://localhost:5173
 
-<!-- #default-branch-switch -->
+## Usage
 
-[![Edit on StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/mui/material-ui/tree/master/examples/material-ui-vite-ts)
+After logging in, you'll be directed to the API workbench interface where you can select and test various API endpoints.
 
-[![Edit on CodeSandbox](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/p/sandbox/github/mui/material-ui/tree/master/examples/material-ui-vite-ts)
+## Building for Production
 
-## The idea behind the example
-
-This example uses [Vite.js](https://github.com/vitejs/vite).
-It includes `@mui/material` and its peer dependencies, including [Emotion](https://emotion.sh/docs/introduction), the default style engine in Material UI v5.
-
-## What's next?
-
-<!-- #default-branch-switch -->
-
-You now have a working example project.
-You can head back to the documentation and continue by browsing the [templates](https://mui.com/material-ui/getting-started/templates/) section.
+```bash
+npm run build
+```

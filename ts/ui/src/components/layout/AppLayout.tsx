@@ -1,8 +1,8 @@
 import { Link } from "react-router";
 import { useLocation } from "react-router";
-import { 
-  Sidebar, 
-  SidebarContent, 
+import {
+  Sidebar,
+  SidebarContent,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuItem,
@@ -10,7 +10,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
   SidebarFooter,
-  SidebarSeparator
+  SidebarSeparator,
 } from "@/components/ui/sidebar";
 import { HomeIcon, MessageSquareIcon, LogOutIcon } from "lucide-react";
 
@@ -20,28 +20,28 @@ interface AppLayoutProps {
 
 export function AppLayout({ children }: AppLayoutProps) {
   const location = useLocation();
-  
+
   const isActive = (path: string) => {
     return location.pathname === path;
   };
 
   return (
     <SidebarProvider>
-      <div className="flex h-screen">
+      <div className="h-screen w-full flex">
         <Sidebar>
-          <SidebarHeader>
+          <SidebarHeader className="py-4">
             <div className="flex items-center px-2">
-              <h2 className="text-xl font-bold">ProtoApp</h2>
+              <h2 className="text-xl font-bold">Protoapp</h2>
               <div className="ml-auto md:hidden">
                 <SidebarTrigger />
               </div>
             </div>
           </SidebarHeader>
-          <SidebarContent>
+          <SidebarContent className="px-2">
             <SidebarMenu>
               <SidebarMenuItem>
-                <SidebarMenuButton 
-                  asChild 
+                <SidebarMenuButton
+                  asChild
                   isActive={isActive("/")}
                   tooltip="Home"
                 >
@@ -52,8 +52,8 @@ export function AppLayout({ children }: AppLayoutProps) {
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton 
-                  asChild 
+                <SidebarMenuButton
+                  asChild
                   isActive={isActive("/messages")}
                   tooltip="Messages"
                 >
@@ -79,10 +79,8 @@ export function AppLayout({ children }: AppLayoutProps) {
             </SidebarMenu>
           </SidebarFooter>
         </Sidebar>
-        <div className="flex-1 overflow-auto">
-          <main className="container py-6">
-            {children}
-          </main>
+        <div className="flex flex-1">
+          <main className="flex flex-1">{children}</main>
         </div>
       </div>
     </SidebarProvider>

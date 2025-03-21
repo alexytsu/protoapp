@@ -10,7 +10,7 @@ export function Landing() {
     case 'loading':
       return <div />;
     case 'auth':
-      return <Redirect to='/messages' />;
+      return <Redirect to='/api-workbench' />;
     default:
       return <Redirect to='/login' />;
   }
