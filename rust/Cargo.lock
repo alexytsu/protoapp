@@ -1749,6 +1749,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "processor"
+version = "0.1.0"
+dependencies = [
+ "rand",
+ "sea-query",
+ "sea-query-binder",
+ "serde",
+ "serde_json",
+ "shared",
+ "sqlx",
+]
+
+[[package]]
 name = "protoapp"
 version = "0.1.0"
 dependencies = [
