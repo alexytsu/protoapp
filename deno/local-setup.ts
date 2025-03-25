@@ -7,7 +7,7 @@ import {
 
 const ADL = packages.adl("1.2.4");
 const NODE = packages.nodejs("20.7.0");
-const PNPM = packages.pnpm("8.3.1");
+const PNPM = packages.pnpm("10.6.5");
 
 export async function main() {
   if (Deno.args.length != 2) {
