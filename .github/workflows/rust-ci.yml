@@ -20,22 +20,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Cache Rust dependencies
-        uses: Swatinem/rust-cache@v2
-        with:
-          # Only cache dependencies, not target directory
-          cache-targets: false
-          # Cache all crates in the workspace
-          cache-all-crates: true
-          # Configure workspace paths
-          workspaces: |
-            rust -> rust/target
-          # Additional directories to cache
-          cache-directories: |
-            rust/.cargo
-          # Save cache even on failure
-          cache-on-failure: true
-
       - name: Check and Build
         run: cd rust && make check-build
 
@@ -61,22 +45,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Cache Rust dependencies
-        uses: Swatinem/rust-cache@v2
-        with:
-          # Only cache dependencies, not target directory
-          cache-targets: false
-          # Cache all crates in the workspace
-          cache-all-crates: true
-          # Configure workspace paths
-          workspaces: |
-            rust -> rust/target
-          # Additional directories to cache
-          cache-directories: |
-            rust/.cargo
-          # Save cache even on failure
-          cache-on-failure: true
 
       - name: Run tests
         run: cd rust && make ci-test
