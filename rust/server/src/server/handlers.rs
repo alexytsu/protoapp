@@ -21,7 +21,7 @@ use super::{db, jwt, AppState};
 type ReqContext = AdlReqContext<AppState>;
 
 pub async fn healthy(_ctx: ReqContext, _i: ()) -> HandlerResult<()> {
-    Ok(())
+    return Ok(());
 }
 
 pub async fn login(ctx: ReqContext, i: LoginReq) -> HandlerResult<LoginResp> {
