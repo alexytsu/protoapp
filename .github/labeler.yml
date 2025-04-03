@@ -2,3 +2,5 @@ rust:
   - rust/**/*
 typescript:
   - ts/**/*
+deno:
+  - deno/**/*

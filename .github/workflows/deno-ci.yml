@@ -1,0 +1,30 @@
+name: Deno CI
+on:
+  push:
+    branches: [master]
+  pull_request:
+    types: [opened, synchronize, labeled, unlabeled]
+
+jobs:
+  lint-and-format:
+    # always on main; on PRs only if deno code has changed
+    if:
+      github.event_name == 'push' ||
+      contains(github.event.pull_request.labels.*.name, 'deno')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Deno using local-setup script
+        run: |
+          source deno/local-setup.sh
+          deno --version
+
+      - name: Check formatting
+        working-directory: ./deno
+        run: deno fmt --check
+
+      - name: Run linter
+        working-directory: ./deno
+        run: deno lint
