@@ -4,7 +4,7 @@ use std::{
     time::{Duration, UNIX_EPOCH},
 };
 
-use crate::adl::{
+use crate::{
     custom::common::db::DbKey, custom::common::time::Instant, rt::custom::sys::types::maybe::Maybe,
 };
 
@@ -142,7 +142,7 @@ where
 #[macro_export]
 macro_rules! derive_db_conversions_adl {
     ($name:ty) => {
-        impl crate::adl::db::types::DbConversions for $name {
+        impl crate::db::types::DbConversions for $name {
             type DbType = serde_json::Value;
             fn to_db(&self) -> Self::DbType {
                 serde_json::to_value(self).expect("should be able to serialize an adl value")
@@ -157,7 +157,7 @@ macro_rules! derive_db_conversions_adl {
 #[macro_export]
 macro_rules! derive_db_conversions_adl_enum {
     ($name:ty) => {
-        impl crate::adl::db::types::DbConversions for $name {
+        impl crate::db::types::DbConversions for $name {
             type DbType = String;
             fn to_db(&self) -> Self::DbType {
                 let jv =

@@ -1,5 +1,5 @@
 [package]
-name = "shared"
+name = "adl"
 version = "0.1.0"
 edition = "2021"
 description = "ADL generated code for the protoapp application"

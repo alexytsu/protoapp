@@ -5,10 +5,10 @@ use serde::Serialize;
 use sqlx::postgres::PgPoolOptions;
 use sqlx::Executor;
 
-use shared::adl::gen::common::http::{HttpMethod, HttpReq};
-use shared::adl::gen::protoapp::apis;
-use shared::adl::gen::protoapp::apis::ui::LoginReq;
-use shared::adl::gen::protoapp::config::server::{DbConnectionConfig, ServerConfig};
+use adl::gen::common::http::{HttpMethod, HttpReq};
+use adl::gen::protoapp::apis;
+use adl::gen::protoapp::apis::ui::LoginReq;
+use adl::gen::protoapp::config::server::{DbConnectionConfig, ServerConfig};
 
 use crate::server::passwords::hash_password;
 

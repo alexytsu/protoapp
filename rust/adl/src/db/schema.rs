@@ -4,9 +4,9 @@
 use super::types::ColumnSpec;
 use sea_query::{Alias, DynIden, IntoIden};
 
-use crate::adl::custom::common::db::DbKey;
-use crate::adl::gen as adlgen;
-use crate::adl::rt as adlrt;
+use crate::custom::common::db::DbKey;
+use crate::gen as adlgen;
+use crate::rt as adlrt;
 
 pub struct AppUser {}
 
@@ -63,7 +63,7 @@ impl Message {
         ColumnSpec::new(Self::table_str(), "id")
     }
 
-    pub fn posted_at() -> ColumnSpec<crate::adl::custom::common::time::Instant> {
+    pub fn posted_at() -> ColumnSpec<crate::custom::common::time::Instant> {
         ColumnSpec::new(Self::table_str(), "posted_at")
     }
 
@@ -75,4 +75,3 @@ impl Message {
         ColumnSpec::new(Self::table_str(), "message")
     }
 }
-

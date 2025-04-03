@@ -2,15 +2,15 @@ use poem::handler;
 use poem::web::cookie::{Cookie, CookieJar};
 use poem::web::Json;
 
-use shared::adl::custom::common::db::DbKey;
-use shared::adl::gen::common::http::Unit;
-use shared::adl::gen::protoapp::apis::ui::{
+use adl::custom::common::db::DbKey;
+use adl::gen::common::http::Unit;
+use adl::gen::protoapp::apis::ui::{
     ApiRequests, LoginReq, LoginResp, LoginTokens, Message, Paginated, QueryUsersReq,
     RecentMessagesReq, RefreshReq, RefreshResp, User, UserDetails, UserWithId, WithId,
 };
-use shared::adl::gen::protoapp::config::server::ServerConfig;
-use shared::adl::gen::protoapp::db::{AppUser, AppUserId};
-use shared::adl::gen::protoapp::{apis::ui::NewMessageReq, db::MessageId};
+use adl::gen::protoapp::config::server::ServerConfig;
+use adl::gen::protoapp::db::{AppUser, AppUserId};
+use adl::gen::protoapp::{apis::ui::NewMessageReq, db::MessageId};
 
 use crate::server::jwt::AccessClaims;
 use crate::server::passwords::{hash_password, verify_password};

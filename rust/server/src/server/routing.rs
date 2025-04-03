@@ -2,7 +2,7 @@ use poem::endpoint::{DynEndpoint, ToDynEndpoint};
 use poem::session::{CookieConfig, CookieSession};
 use poem::{post, EndpointExt, Route};
 
-use shared::adl::gen::protoapp::apis::ui::ApiRequests;
+use adl::gen::protoapp::apis::ui::ApiRequests;
 
 use crate::server::handlers;
 use crate::server::poem_adl_interop::{new_access_token_checker, RouteExt};

@@ -1,10 +1,10 @@
 // @generated from adl module protoapp.db
 
-use crate::adl::custom::common::db::DbKey;
-use crate::adl::custom::common::time::Instant;
-use crate::adl::gen::common::db::WithId;
-use crate::adl::gen::common::strings::StringML;
-use crate::adl::gen::common::strings::StringNE;
+use crate::custom::common::db::DbKey;
+use crate::custom::common::time::Instant;
+use crate::gen::common::db::WithId;
+use crate::gen::common::strings::StringML;
+use crate::gen::common::strings::StringNE;
 use serde::Deserialize;
 use serde::Deserializer;
 use serde::Serialize;

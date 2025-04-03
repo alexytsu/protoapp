@@ -1,6 +1,6 @@
-use shared::adl::gen::common::http::Unit;
-use shared::adl::gen::protoapp::apis;
-use shared::adl::gen::protoapp::apis::ui::{
+use adl::gen::common::http::Unit;
+use adl::gen::protoapp::apis;
+use adl::gen::protoapp::apis::ui::{
     LoginReq, LoginTokens, Message, PageReq, Paginated, RefreshReq,
 };
 

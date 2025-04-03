@@ -3,7 +3,7 @@ use sea_query_binder::SqlxBinder;
 use sqlx::Row;
 use std::time::SystemTime;
 
-use shared::adl::{
+use adl::{
     custom::common::{db::DbKey, time::Instant},
     db::{
         schema,

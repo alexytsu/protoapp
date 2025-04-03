@@ -1,6 +1,6 @@
 use clap::{Args, Parser, Subcommand};
 
-use shared::adl::gen::protoapp::db::AppUser;
+use adl::gen::protoapp::db::AppUser;
 
 use protoapp::server::{db, passwords::hash_password};
 use sqlx::postgres::PgPoolOptions;

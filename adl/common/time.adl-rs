@@ -4,8 +4,8 @@ module common.time {
 import adlc.config.rust.*;
 
 annotation Instant RustCustomType {
-  "rustname" : "crate::adl::custom::common::time::Instant",
-  "helpers" : "crate::adl::custom::common::time::Instant",
+  "rustname" : "crate::custom::common::time::Instant",
+  "helpers" : "crate::custom::common::time::Instant",
   "stdTraits": ["Eq", "PartialEq", "Hash", "Serialize", "Deserialize", "Clone"]
 };
 

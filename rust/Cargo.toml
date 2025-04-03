@@ -1,9 +1,9 @@
 [workspace]
-members = [ "server", "shared" ]
+members = [ "server", "adl" ]
 resolver = "2"
 
 [workspace.dependencies]
-shared = { path = "shared" }
+adl = { path = "adl" }
 
 base64 = "0.21.2"
 env_logger = "0.10.0"

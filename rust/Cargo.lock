@@ -12,6 +12,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "adl"
+version = "0.1.0"
+dependencies = [
+ "base64 0.21.7",
+ "rand 0.8.5",
+ "sea-query",
+ "sea-query-binder",
+ "serde",
+ "serde_json",
+ "sqlx",
+]
+
+[[package]]
 name = "adler2"
 version = "2.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1760,6 +1773,7 @@ dependencies = [
 name = "protoapp"
 version = "0.1.0"
 dependencies = [
+ "adl",
  "anyhow",
  "argon2",
  "async-trait",
@@ -1778,7 +1792,6 @@ dependencies = [
  "sea-query-binder",
  "serde",
  "serde_json",
- "shared",
  "sqlx",
  "test-log",
  "time",
@@ -2185,19 +2198,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f40ca3c46823713e0d4209592e8d6e826aa57e928f09752619fc696c499637f6"
 dependencies = [
  "lazy_static",
-]
-
-[[package]]
-name = "shared"
-version = "0.1.0"
-dependencies = [
- "base64 0.21.7",
- "rand 0.8.5",
- "sea-query",
- "sea-query-binder",
- "serde",
- "serde_json",
- "sqlx",
 ]
 
 [[package]]
