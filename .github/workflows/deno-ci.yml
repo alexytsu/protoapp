@@ -1,16 +1,14 @@
+# always on main; on PRs only if deno code has changed
 name: Deno CI
 on:
   push:
     branches: [master]
   pull_request:
-    types: [opened, synchronize, labeled, unlabeled]
+    paths:
+      - "deno/**"
 
 jobs:
   lint-and-format:
-    # always on main; on PRs only if deno code has changed
-    if:
-      github.event_name == 'push' ||
-      contains(github.event.pull_request.labels.*.name, 'deno')
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
