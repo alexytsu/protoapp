@@ -1,7 +1,12 @@
 import * as adl from "@adllang/adl-runtime";
 import * as adlast from "@adllang/adlc-tools/adlgen/sys/adlast";
 
-import { JsonObject, Json, createJsonBinding, scopedName } from "@adllang/adl-runtime";
+import {
+  createJsonBinding,
+  Json,
+  JsonObject,
+  scopedName,
+} from "@adllang/adl-runtime";
 import { AdlSourceParams } from "@adllang/adlc-tools/utils/sources";
 
 import {
@@ -18,7 +23,7 @@ import {
 import { snakeCase } from "@mesqueeb/case-anything";
 import mustache from "mustache_ts";
 
-export interface GenSqlParams  extends AdlSourceParams {
+export interface GenSqlParams extends AdlSourceParams {
   extensions?: string[];
   templates?: Template[];
   viewsFile: string;
@@ -37,8 +42,8 @@ export interface Template {
 }
 
 export interface DbResources {
-  tables: DbTable[],
-  views: DbView[],
+  tables: DbTable[];
+  views: DbView[];
 }
 
 export interface DbTable {
@@ -74,21 +79,34 @@ export async function loadDbResources(
 ): Promise<{ loadedAdl: LoadedAdl; dbResources: DbResources }> {
   const loadedAdl = await parseAdlModules(params);
 
-  const dbResources: DbResources = {tables:[], views:[]}
+  const dbResources: DbResources = { tables: [], views: [] };
 
   // Find all of the struct declarations that have a DbTable annotation
   forEachDecl(loadedAdl.modules, (scopedDecl) => {
     const ann = getAnnotation(scopedDecl.decl.annotations, DB_TABLE);
     if (ann != undefined) {
-      const scopedName = {moduleName: scopedDecl.moduleName, name: scopedDecl.decl.name};
+      const scopedName = {
+        moduleName: scopedDecl.moduleName,
+        name: scopedDecl.decl.name,
+      };
       const name = getDbTableName(scopedDecl);
       const fields = getDbFields(loadedAdl, scopedDecl);
       const primaryKey = getPrimaryKey(fields);
-      const idPrefix = (ann as {id_prefix: string}).id_prefix || '';
-      dbResources.tables.push({ scopedName, scopedDecl, fields, ann, name, primaryKey, idPrefix });
+      const idPrefix = (ann as { id_prefix: string }).id_prefix || "";
+      dbResources.tables.push({
+        scopedName,
+        scopedDecl,
+        fields,
+        ann,
+        name,
+        primaryKey,
+        idPrefix,
+      });
     }
   });
-  dbResources.tables.sort((t1, t2) => t1.name < t2.name ? -1 : t1.name > t2.name ? 1 : 0);
+  dbResources.tables.sort((t1, t2) =>
+    t1.name < t2.name ? -1 : t1.name > t2.name ? 1 : 0
+  );
 
   // Find all of the struct declarations that have a DbView annotation
   forEachDecl(loadedAdl.modules, (scopedDecl) => {
@@ -100,7 +118,9 @@ export async function loadDbResources(
     }
   });
 
-  dbResources.views.sort((t1, t2) => t1.name < t2.name ? -1 : t1.name > t2.name ? 1 : 0);
+  dbResources.views.sort((t1, t2) =>
+    t1.name < t2.name ? -1 : t1.name > t2.name ? 1 : 0
+  );
 
   return { loadedAdl, dbResources };
 }
@@ -155,13 +175,19 @@ async function generateCreateSqlSchema(
   for (const t of dbTables) {
     const ann: JsonObject = t.ann as JsonObject;
     const indexes = (ann["indexes"] || []) as string[][];
-    const uniquenessConstraints = (ann["uniqueness_constraints"] || []) as string[][];
-    const extraSql = (ann["extra_sql"] as string[] || []);
+    const uniquenessConstraints =
+      (ann["uniqueness_constraints"] || []) as string[][];
+    const extraSql = ann["extra_sql"] as string[] || [];
 
     const lines: { code: string; comment?: string }[] = [];
     for (const f of t.fields) {
       const columnName = getColumnName(f);
-      const columnType = getColumnType(loadedAdl.resolver, dbTables, f, dbProfile);
+      const columnType = getColumnType(
+        loadedAdl.resolver,
+        dbTables,
+        f,
+        dbProfile,
+      );
       lines.push({
         code: `${columnName} ${columnType.sqltype}${
           columnType.notNullable ? " not null" : ""
@@ -179,14 +205,14 @@ async function generateCreateSqlSchema(
       }
     }
 
-    const findColName = function(s: string): string {
+    const findColName = function (s: string): string {
       for (const f of t.fields) {
         if (f.name == s) {
           return getColumnName(f);
         }
       }
       return s;
-    }
+    };
 
     for (let i = 0; i < indexes.length; i++) {
       const cols = indexes[i].map(findColName);
@@ -199,8 +225,10 @@ async function generateCreateSqlSchema(
     for (let i = 0; i < uniquenessConstraints.length; i++) {
       const cols = uniquenessConstraints[i].map(findColName);
       constraints.push(
-        `alter table ${quoteReservedName(t.name)} add constraint ${t.name}_${i +
-          1}_con unique (${cols.join(", ")});`,
+        `alter table ${quoteReservedName(t.name)} add constraint ${t.name}_${
+          i +
+          1
+        }_con unique (${cols.join(", ")});`,
       );
     }
     if (t.primaryKey.length > 0) {
@@ -283,7 +311,7 @@ function getDbTableName(scopedDecl: adlast.ScopedDecl): string {
 /**
  *  Returns the SQL name for the view
  */
- function getViewName(scopedDecl: adlast.ScopedDecl): string {
+function getViewName(scopedDecl: adlast.ScopedDecl): string {
   const ann = getAnnotation(scopedDecl.decl.annotations, DB_VIEW);
   const viewName = assumeField<string>(ann, "view_name");
   return viewName || snakeCase(scopedDecl.decl.name);
@@ -292,17 +320,22 @@ function getDbTableName(scopedDecl: adlast.ScopedDecl): string {
 /**
  *  Returns the adl fields that will beome table columns
  */
-function getDbFields(loadedAdl: LoadedAdl, scopedDecl: adlast.ScopedDecl): DbField[] {
-
-  function _fromDecl(scopedDecl: adlast.ScopedDecl, typeBindings: TypeBinding[]): adlast.Field[] {
-    if (scopedDecl.decl.type_.kind == 'type_') {
-      const typeExpr0 =scopedDecl.decl.type_.value.typeExpr;
+function getDbFields(
+  loadedAdl: LoadedAdl,
+  scopedDecl: adlast.ScopedDecl,
+): DbField[] {
+  function _fromDecl(
+    scopedDecl: adlast.ScopedDecl,
+    typeBindings: TypeBinding[],
+  ): adlast.Field[] {
+    if (scopedDecl.decl.type_.kind == "type_") {
+      const typeExpr0 = scopedDecl.decl.type_.value.typeExpr;
       const typeExpr = substituteTypeBindings(typeExpr0, typeBindings);
       return _fromTypeExpr(typeExpr);
     }
 
-    if (scopedDecl.decl.type_.kind == 'newtype_') {
-      const typeExpr0 =scopedDecl.decl.type_.value.typeExpr;
+    if (scopedDecl.decl.type_.kind == "newtype_") {
+      const typeExpr0 = scopedDecl.decl.type_.value.typeExpr;
       const typeExpr = substituteTypeBindings(typeExpr0, typeBindings);
       return _fromTypeExpr(typeExpr);
     }
@@ -321,7 +354,7 @@ function getDbFields(loadedAdl: LoadedAdl, scopedDecl: adlast.ScopedDecl): DbFie
   }
 
   function _fromTypeExpr(typeExpr: adlast.TypeExpr): DbField[] {
-    if (typeExpr.typeRef.kind != 'reference') {
+    if (typeExpr.typeRef.kind != "reference") {
       throw new Error("db type expressions must reference a decl");
     }
     const decl = loadedAdl.resolver(typeExpr.typeRef.value);
@@ -330,7 +363,10 @@ function getDbFields(loadedAdl: LoadedAdl, scopedDecl: adlast.ScopedDecl): DbFie
     return _fromDecl(decl, typeBindings);
   }
 
-  function _fromField(field: adlast.Field, typeBindings: TypeBinding[]): DbField[] {
+  function _fromField(
+    field: adlast.Field,
+    typeBindings: TypeBinding[],
+  ): DbField[] {
     const typeExpr = substituteTypeBindings(field.typeExpr, typeBindings);
     const isSpread = getAnnotation(field.annotations, DB_SPREAD) !== undefined;
 
@@ -343,7 +379,7 @@ function getDbFields(loadedAdl: LoadedAdl, scopedDecl: adlast.ScopedDecl): DbFie
       serializedName: field.serializedName,
       typeExpr,
       default: field.default,
-      annotations: field.annotations
+      annotations: field.annotations,
     }];
   }
 
@@ -357,14 +393,13 @@ type DbField = adlast.Field; // For now
  */
 function getPrimaryKey(fields: DbField[]): string[] {
   const primaryKey = fields.filter(
-    f => getAnnotation(f.annotations, DB_PRIMARY_KEY) !== undefined
+    (f) => getAnnotation(f.annotations, DB_PRIMARY_KEY) !== undefined,
   ).map(
-    f => getColumnName(f)
+    (f) => getColumnName(f),
   );
 
   return primaryKey;
 }
-
 
 function assumeField<T>(
   obj: Json | undefined,
@@ -429,7 +464,8 @@ function getColumnType(
   const dtype = decodeTypeExpr(typeExpr);
   if (
     dtype.kind == "Nullable" ||
-    dtype.kind == "Reference" && adl.scopedNamesEqual(dtype.refScopedName, MAYBE)
+    dtype.kind == "Reference" &&
+      adl.scopedNamesEqual(dtype.refScopedName, MAYBE)
   ) {
     return {
       sqltype: annctype ||
@@ -458,7 +494,7 @@ function getColumnType1(
       const sdecl = resolver(dtype.refScopedName);
 
       const ann = getAnnotation(sdecl.decl.annotations, DB_COLUMN_TYPE);
-      if (typeof (ann) === "string") {
+      if (typeof ann === "string") {
         return ann;
       }
 
@@ -492,16 +528,23 @@ function getForeignKeyRef(
   });
   const dtype = decodeTypeExpr(typeExpr);
   if (
-    dtype.kind == "Reference" && adl.scopedNamesEqual(dtype.refScopedName, DB_KEY)
+    dtype.kind == "Reference" &&
+    adl.scopedNamesEqual(dtype.refScopedName, DB_KEY)
   ) {
     const param0 = dtype.parameters[0];
     if (param0.kind == "Reference") {
-      const table = dbTables.find( t =>adl.scopedNamesEqual(param0.refScopedName, t.scopedName));
+      const table = dbTables.find((t) =>
+        adl.scopedNamesEqual(param0.refScopedName, t.scopedName)
+      );
       if (!table) {
-        throw new Error(`No table declaration for ${param0.refScopedName.moduleName}.${param0.refScopedName.name}`);
+        throw new Error(
+          `No table declaration for ${param0.refScopedName.moduleName}.${param0.refScopedName.name}`,
+        );
       }
       if (table.primaryKey.length !== 1) {
-        throw new Error(`No singular primary key for ${param0.refScopedName.moduleName}.${param0.refScopedName.name}`);
+        throw new Error(
+          `No singular primary key for ${param0.refScopedName.moduleName}.${param0.refScopedName.name}`,
+        );
       }
       const decl = resolver(param0.refScopedName);
       return { table: getDbTableName(decl), column: table.primaryKey[0] };
@@ -684,8 +727,7 @@ export async function generateMetadata(
     writer,
     [
       ...dbTables.map((dbt) => dbt.scopedDecl),
-      ...dbResources.views.map((dbv) => dbv.scopedDecl)
-
+      ...dbResources.views.map((dbv) => dbv.scopedDecl),
     ],
   );
   await writer.close();
@@ -701,12 +743,12 @@ export async function generateViews(
   writer.write("\n");
   for (const dbView of dbResources.views) {
     const ann0 = getAnnotation(dbView.scopedDecl.decl.annotations, DB_VIEW);
-    const ann = ann0 as Record<string,string[] | undefined>;
+    const ann = ann0 as Record<string, string[] | undefined>;
     const viewSql: string[] = ann["viewSql"] || [];
     if (viewSql.length > 0) {
-      writer.write(`drop view if exists ${getViewName(dbView.scopedDecl)};\n`)
+      writer.write(`drop view if exists ${getViewName(dbView.scopedDecl)};\n`);
       writer.write("\n");
-      for(const sql of viewSql) {
+      for (const sql of viewSql) {
         writer.write(sql + "\n");
       }
       writer.write("\n");
@@ -786,36 +828,41 @@ function dbstr(s: string) {
   return "'" + s.replace(/'/g, "''") + "'";
 }
 
-
 interface TypeBinding {
-  name: string,
-  value: adlast.TypeExpr,
+  name: string;
+  value: adlast.TypeExpr;
 }
 
-function createTypeBindings(names: string[], values: adlast.TypeExpr[]): TypeBinding[] {
+function createTypeBindings(
+  names: string[],
+  values: adlast.TypeExpr[],
+): TypeBinding[] {
   const result: TypeBinding[] = [];
   for (let i = 0; i < names.length; i++) {
-    result.push({name:names[i], value:values[i]});
+    result.push({ name: names[i], value: values[i] });
   }
   return result;
 }
 
-function substituteTypeBindings(texpr: adlast.TypeExpr, bindings: TypeBinding[]): adlast.TypeExpr {
+function substituteTypeBindings(
+  texpr: adlast.TypeExpr,
+  bindings: TypeBinding[],
+): adlast.TypeExpr {
   const parameters = texpr.parameters.map(
-    te => substituteTypeBindings(te, bindings)
+    (te) => substituteTypeBindings(te, bindings),
   );
 
-  if (texpr.typeRef.kind == 'typeParam') {
+  if (texpr.typeRef.kind == "typeParam") {
     const name = texpr.typeRef.value;
-    const binding = bindings.find(b => b.name === name);
+    const binding = bindings.find((b) => b.name === name);
     if (!binding) {
       return {
         typeRef: texpr.typeRef,
-        parameters
-      }
+        parameters,
+      };
     } else {
       if (parameters.length != 0) {
-        throw new Error("Type param not a concrete type")
+        throw new Error("Type param not a concrete type");
       }
       return binding.value;
     }
@@ -823,8 +870,8 @@ function substituteTypeBindings(texpr: adlast.TypeExpr, bindings: TypeBinding[])
 
   return {
     typeRef: texpr.typeRef,
-    parameters
-  }
+    parameters,
+  };
 }
 
 const DOC = scopedName("sys.annotations", "Doc");
@@ -837,4 +884,3 @@ const DB_VIEW = scopedName("common.db", "DbView");
 const DB_COLUMN_NAME = scopedName("common.db", "DbColumnName");
 const DB_COLUMN_TYPE = scopedName("common.db", "DbColumnType");
 const DB_KEY = scopedName("common.db", "DbKey");
-
