@@ -75,3 +75,4 @@ impl Message {
         ColumnSpec::new(Self::table_str(), "message")
     }
 }
+

@@ -37,7 +37,7 @@ async function main() {
     //----------------------------------------------------------------------
     // Generate rust for the protoapp server
     
-    const outputDir = repo + "/rust/shared/src";
+    const outputDir = repo + "/rust/adl/src";
     await genRust({
       ...commonFlags,
       adlModules: [
@@ -46,8 +46,8 @@ async function main() {
         "protoapp.config.server"
       ],
       outputDir: outputDir,
-      module: "adl::gen",
-      runtimeModule: "adl::rt",
+      module: "gen",
+      runtimeModule: "rt",
       includeRuntime: true,
       manifest: outputDir + "/.adl-manifest",
       generateTransitive: true,
@@ -59,7 +59,7 @@ async function main() {
       adlModules: [
         "protoapp.db"
       ],
-      outputFile: outputDir + '/adl/db/schema.rs',
+      outputFile: outputDir + '/db/schema.rs',
     });
   }
 
