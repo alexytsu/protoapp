@@ -1,9 +1,11 @@
+# always on main; on PRs only if rust code has changed
 name: Rust CI
 on:
   push:
     branches: [master]
   pull_request:
-    types: [opened, synchronize, labeled, unlabeled]
+    paths:
+      - "rust/**"
 
 env:
   CARGO_TERM_COLOR: always
@@ -11,10 +13,6 @@ env:
 
 jobs:
   check-and-build:
-    # always on main; on PRs only if rust code has changed
-    if:
-      github.event_name == 'push' ||
-      contains(github.event.pull_request.labels.*.name, 'rust')
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
