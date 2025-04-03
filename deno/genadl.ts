@@ -10,12 +10,12 @@ async function main() {
   const commonFlags = {
     searchPath: [repo + "/adl"],
     verbose: false,
-  }
+  };
 
   {
     //----------------------------------------------------------------------
     // Generate typescript for the protoapp ui
-    
+
     const outputDir = repo + "/ts/ui/src/adl-gen";
     await genTypescript({
       ...commonFlags,
@@ -36,14 +36,14 @@ async function main() {
   {
     //----------------------------------------------------------------------
     // Generate rust for the protoapp server
-    
+
     const outputDir = repo + "/rust/adl/src";
     await genRust({
       ...commonFlags,
       adlModules: [
         "protoapp.apis.ui",
         "protoapp.db",
-        "protoapp.config.server"
+        "protoapp.config.server",
       ],
       outputDir: outputDir,
       module: "gen",
@@ -53,40 +53,39 @@ async function main() {
       generateTransitive: true,
     });
 
-
     await genRustSeaQuerySchema({
       ...commonFlags,
       adlModules: [
-        "protoapp.db"
+        "protoapp.db",
       ],
-      outputFile: outputDir + '/db/schema.rs',
+      outputFile: outputDir + "/db/schema.rs",
     });
   }
 
   {
     //----------------------------------------------------------------------
     // Generate a db schema
-    
+
     await genCreateSqlSchema({
       ...commonFlags,
-      mergeAdlExts: ['adl-pg'],
+      mergeAdlExts: ["adl-pg"],
       adlModules: [
         "protoapp.db",
       ],
-      createFile:  repo + "/sql/adl-gen/adl-tables.latest.sql",
-      viewsFile:  repo + "/sql/adl-gen/adl-views.latest.sql",
+      createFile: repo + "/sql/adl-gen/adl-tables.latest.sql",
+      viewsFile: repo + "/sql/adl-gen/adl-views.latest.sql",
     });
 
-    // Make the first migrations these two files. Once there is a live 
+    // Make the first migrations these two files. Once there is a live
     // database, these copy operations should be deleted, and migrations
     // written by hand
     Deno.copyFile(
-     repo + "/sql/adl-gen/adl-tables.latest.sql",
-     repo + "/rust/server/migrations/00000000000020_adl-tables.latest.sql",
+      repo + "/sql/adl-gen/adl-tables.latest.sql",
+      repo + "/rust/server/migrations/00000000000020_adl-tables.latest.sql",
     );
     Deno.copyFile(
-     repo + "/sql/adl-gen/adl-views.latest.sql",
-     repo + "/rust/server/migrations/00000000000030_adl-views.latest.sql",
+      repo + "/sql/adl-gen/adl-views.latest.sql",
+      repo + "/rust/server/migrations/00000000000030_adl-views.latest.sql",
     );
   }
 }
