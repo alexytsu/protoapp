@@ -22,10 +22,6 @@ jobs:
         run: cd rust && make check-build
 
   test:
-    # always on main; on PRs only if rust code has changed
-    if:
-      github.event_name == 'push' ||
-      contains(github.event.pull_request.labels.*.name, 'rust')
     runs-on: ubuntu-latest
     services:
       postgres:
