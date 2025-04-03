@@ -1,8 +1,8 @@
 import {
-  packages,
   forPlatform,
   getHostPlatform,
-  installTo
+  installTo,
+  packages,
 } from "@adllang/local-setup";
 
 const ADL = packages.adl("1.2.4");

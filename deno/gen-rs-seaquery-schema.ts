@@ -1,11 +1,11 @@
 import { isEnum } from "@adllang/adl-runtime";
 import { AdlSourceParams } from "@adllang/adlc-tools/utils/sources";
 import {
-  decodeTypeExpr,
   DecodedTypeExpr,
-  LoadedAdl,
+  decodeTypeExpr,
   getAnnotation,
   hasAnnotation,
+  LoadedAdl,
   scopedName,
 } from "@adllang/adlc-tools/utils/adl";
 import * as adlast from "@adllang/adlc-tools/adlgen/sys/adlast";
@@ -22,7 +22,7 @@ export interface GenRustSeaQuerySchemaParams extends AdlSourceParams {
  * library
  */
 export async function genRustSeaQuerySchema(
-  params: GenRustSeaQuerySchemaParams
+  params: GenRustSeaQuerySchemaParams,
 ): Promise<void> {
   const { loadedAdl, dbResources } = await loadDbResources({
     mergeAdlExts: ["adl-rs"],
@@ -74,7 +74,7 @@ export async function genRustSeaQuerySchema(
       writer.write("\n");
       writer.write(`    pub fn ${f.name}() -> ColumnSpec<${typeStr}> {\n`);
       writer.write(
-        `        ColumnSpec::new(Self::table_str(), "${snakeCase(f.name)}")\n`
+        `        ColumnSpec::new(Self::table_str(), "${snakeCase(f.name)}")\n`,
       );
       writer.write(`    }\n`);
     }
@@ -90,11 +90,11 @@ export async function genRustSeaQuerySchema(
       const dtd = declsToDerive[key];
       if (dtd.isEnum) {
         writer.write(
-          `derive_db_conversions_adl_enum!(${rustScopedName(dtd.sn)});\n`
+          `derive_db_conversions_adl_enum!(${rustScopedName(dtd.sn)});\n`,
         );
       } else {
         writer.write(
-          `derive_db_conversions_adl!(${rustScopedName(dtd.sn)});\n`
+          `derive_db_conversions_adl!(${rustScopedName(dtd.sn)});\n`,
         );
       }
     }
@@ -110,7 +110,7 @@ interface DeclToDerive {
 
 function declToDerive(
   loadedAdl: LoadedAdl,
-  dte: DecodedTypeExpr
+  dte: DecodedTypeExpr,
 ): DeclToDerive | undefined {
   if (dte.kind === "Reference") {
     const sn = dte.refScopedName;
@@ -181,14 +181,14 @@ function genTypeExpr(loadedAdl: LoadedAdl, dte: DecodedTypeExpr): string {
 
 function genTypeExprForCustomType(
   loadedAdl: LoadedAdl,
-  dte: DecodedTypeExpr
+  dte: DecodedTypeExpr,
 ): string | undefined {
   if (dte.kind !== "Reference") {
     return;
   }
   const customAnnotation = getRustCustomTypeAnnotation(
     loadedAdl,
-    dte.refScopedName
+    dte.refScopedName,
   );
   if (customAnnotation === undefined) {
     return;
@@ -213,7 +213,7 @@ function genTypeParams(loadedAdl: LoadedAdl, dtes: DecodedTypeExpr[]): string {
 
 function getRustCustomTypeAnnotation(
   loadedAdl: LoadedAdl,
-  sn: adlast.ScopedName
+  sn: adlast.ScopedName,
 ): { rustname: string } | undefined {
   const module = loadedAdl.modules[sn.moduleName];
   if (!module) {
