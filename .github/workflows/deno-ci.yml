@@ -27,3 +27,7 @@ jobs:
       - name: Run linter
         working-directory: ./deno
         run: deno lint
+
+      - name: Check types
+        working-directory: ./deno
+        run: deno check local-setup.ts genadl.ts
