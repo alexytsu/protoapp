@@ -1,4 +1,4 @@
 packages:
   - "adl"
-  - "ui"
+  - "api-workbench"
   - "prettier-config"
