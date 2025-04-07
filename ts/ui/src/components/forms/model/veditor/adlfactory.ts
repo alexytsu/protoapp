@@ -1,12 +1,12 @@
-import * as adlrt  from "@adllang/adl-runtime";
+import * as adlrt from "@adllang/adl-runtime";
 import * as adlast from "@protoapp/adl/sys/adlast";
 import * as systypes from "@protoapp/adl/sys/types";
 import * as adltree from "../adl-tree";
-import { createJsonBinding } from '@adllang/adl-runtime';
+import { createJsonBinding } from "@adllang/adl-runtime";
 
-import {IVEditor, OVEditor, UpdateFn, Validated, invalid, mapValidated, valid} from "./type";
-import {FieldFns} from "../fields/type";
-import {scopedNamesEqual} from "@adllang/adl-runtime";
+import { IVEditor, OVEditor, UpdateFn, Validated, invalid, mapValidated, valid } from "./type";
+import { FieldFns } from "../fields/type";
+import { scopedNamesEqual } from "@adllang/adl-runtime";
 import { adlPrimitiveFieldFns, maybeField, nullableField } from "../fields/adl";
 import { SelectState } from "../select";
 import { getAdlTableInfo, Column, cellContent } from "../adl-table";
@@ -15,18 +15,13 @@ import { getFormLabelFromAnnotation } from "../adl-annotations";
 /**
  * Construct a VEditor from a a specified ADL type
  */
-export function createVEditor<T,R>(
+export function createVEditor<T, R>(
   typeExpr: adlrt.ATypeExpr<T>,
   declResolver: adlrt.DeclResolver,
   factory: Factory<R>
-): IVEditor<T, unknown, unknown,R> {
+): IVEditor<T, unknown, unknown, R> {
   const adlTree = adltree.createAdlTree(typeExpr.value, declResolver);
-  return createVEditor0(declResolver, nullContext, adlTree, factory) as IVEditor<
-    T,
-    unknown,
-    unknown,
-    R
-  >;
+  return createVEditor0(declResolver, nullContext, adlTree, factory) as IVEditor<T, unknown, unknown, R>;
 }
 
 export interface CustomContext {
@@ -36,11 +31,11 @@ export interface CustomContext {
   typeExpr: adlast.TypeExpr;
 }
 
-export type VEditorCustomize<R> = (ctx: CustomContext) => OVEditor<unknown,R> | null;
+export type VEditorCustomize<R> = (ctx: CustomContext) => OVEditor<unknown, R> | null;
 export type FieldCustomize = (ctx: CustomContext) => FieldFns<unknown> | null;
 
 export interface Factory<R> {
-  getCustomVEditor(ctx: CustomContext): OVEditor<unknown,R> | null;
+  getCustomVEditor(ctx: CustomContext): OVEditor<unknown, R> | null;
   getCustomField(ctx: CustomContext): FieldFns<unknown> | null;
 
   renderFieldEditor(props: FieldEditorProps): R;
@@ -56,8 +51,8 @@ export interface Factory<R> {
 export interface FieldEditorProps {
   fieldfns: FieldFns<unknown>;
   state: string;
-  onUpdate: UpdateFn<string>  
-};
+  onUpdate: UpdateFn<string>;
+}
 
 export interface StructEditorProps<R> {
   fields: StructFieldProps<R>[];
@@ -66,33 +61,32 @@ export interface StructEditorProps<R> {
 export interface StructFieldProps<R> {
   name: string;
   label: string;
-  veditor: VEditorProps<unknown,unknown, unknown,R>
+  veditor: VEditorProps<unknown, unknown, unknown, R>;
 }
 
 export interface UnionEditorProps<R> {
-  selectState: SelectState,
-  veditor: VEditorProps<unknown,unknown,unknown,R> | null;
+  selectState: SelectState;
+  veditor: VEditorProps<unknown, unknown, unknown, R> | null;
 }
 
 export interface MaybeEditorProps<R> {
-  isActive: boolean,
-  toggleIsActive: () => void,
-  veditor: VEditorProps<unknown,unknown,unknown,R>;
+  isActive: boolean;
+  toggleIsActive: () => void;
+  veditor: VEditorProps<unknown, unknown, unknown, R>;
 }
 
-export interface VectorEditorProps<T,R> {
+export interface VectorEditorProps<T, R> {
   values: T[];
-  columns: Column<T,string>[];
-  valueVEditor(): IVEditor<T,unknown,unknown,R>;
+  columns: Column<T, string>[];
+  valueVEditor(): IVEditor<T, unknown, unknown, R>;
   splice(start: number, deleteCount: number, values: T[]): void;
 }
 
-export interface VEditorProps<T,S,E,R> {
-  veditor: IVEditor<T,S,E,R>;
+export interface VEditorProps<T, S, E, R> {
+  veditor: IVEditor<T, S, E, R>;
   state: S;
   onUpdate: (e: E) => void;
 }
-
 
 export interface UnimplementedEditorProps {
   typeExpr: adlast.TypeExpr;
@@ -109,7 +103,7 @@ function createVEditor0<R>(
   declResolver: adlrt.DeclResolver,
   ctx: InternalContext,
   adlTree: adltree.AdlTree,
-  factory: Factory<R>,
+  factory: Factory<R>
 ): IVEditor<unknown, unknown, unknown, R> {
   const customContext = {
     declResolver,
@@ -148,8 +142,17 @@ function createVEditor0<R>(
     }
 
     case "newtype":
-      if (adlTree.typeExpr.typeRef.kind === 'reference' && scopedNamesEqual(systypes.snMap, adlTree.typeExpr.typeRef.value)) {
-         return mapVEditor(declResolver, nullContext, factory, {value:adlTree.typeExpr.parameters[0]}, {value:adlTree.typeExpr.parameters[1]});
+      if (
+        adlTree.typeExpr.typeRef.kind === "reference" &&
+        scopedNamesEqual(systypes.snMap, adlTree.typeExpr.typeRef.value)
+      ) {
+        return mapVEditor(
+          declResolver,
+          nullContext,
+          factory,
+          { value: adlTree.typeExpr.parameters[0] },
+          { value: adlTree.typeExpr.parameters[1] }
+        );
       }
       return createVEditor0(declResolver, nullContext, details.adlTree, factory);
 
@@ -168,11 +171,10 @@ function createVEditor0<R>(
         } else {
           return maybeVEditor(factory, declResolver, adlTree, details);
         }
-      }
-      else {
+      } else {
         const uveditor = unionVEditor(factory, declResolver, adlTree, details);
         if (isEnum(details.fields)) {
-          // The union editor works fine for enums, but we need to map to the 
+          // The union editor works fine for enums, but we need to map to the
           // enum typescript representation
           return mappedVEditor(uveditor, unionFromEnum, enumFromUnion);
         } else {
@@ -183,42 +185,43 @@ function createVEditor0<R>(
 
     case "nullable":
       const fieldfns = createFieldForTParam0(adlTree, customContext, factory, declResolver);
-      if (fieldfns !== null  && fieldfns.validate("") !== null) {
+      if (fieldfns !== null && fieldfns.validate("") !== null) {
         return fieldVEditor(factory, adlTree.typeExpr, nullableField(fieldfns));
       } else {
         // Use a maybe editor
-        const maybeTypeExpr = systypes.texprMaybe({value:details.param.typeExpr});
+        const maybeTypeExpr = systypes.texprMaybe({ value: details.param.typeExpr });
         const maybeEditor = createVEditor(maybeTypeExpr, declResolver, factory);
 
         return mappedVEditor(maybeEditor, maybeFromNullable, nullableFromMaybe);
       }
 
     case "vector": {
-      const udetails = details.param.details(); 
+      const udetails = details.param.details();
       const valueVEditor = () => createVEditor0(declResolver, ctx, details.param, factory);
-      if (udetails.kind == 'struct') {
-        const tableInfo = getAdlTableInfo(declResolver, {value: details.param.typeExpr}, ctx => factory.getCustomField(ctx));
-        const columns = tableInfo.columns.map(c => c.column);
+      if (udetails.kind == "struct") {
+        const tableInfo = getAdlTableInfo(declResolver, { value: details.param.typeExpr }, (ctx) =>
+          factory.getCustomField(ctx)
+        );
+        const columns = tableInfo.columns.map((c) => c.column);
         return genericVectorVEditor(factory, columns, valueVEditor);
-
-      } else if (udetails.kind == 'union') {
-          // The default view for a vector of unions is to just show the discriminator
+      } else if (udetails.kind == "union") {
+        // The default view for a vector of unions is to just show the discriminator
         if (isEnum(udetails.fields)) {
           let columns: Column<string, string>[] = [
-             {
-                header: cellContent(udetails.astDecl.name),
-                id: "kind",
-                content: v => cellContent(v),
-             },
+            {
+              header: cellContent(udetails.astDecl.name),
+              id: "kind",
+              content: (v) => cellContent(v)
+            }
           ];
           return genericVectorVEditor(factory, columns, valueVEditor);
         } else {
-          let columns: Column<{kind:string}, string>[] = [
-             {
-                header: cellContent(`${udetails.astDecl.name}`),
-                id: "kind",
-                content: v => cellContent(v.kind),
-             },
+          let columns: Column<{ kind: string }, string>[] = [
+            {
+              header: cellContent(`${udetails.astDecl.name}`),
+              id: "kind",
+              content: (v) => cellContent(v.kind)
+            }
           ];
           return genericVectorVEditor(factory, columns, valueVEditor);
         }
@@ -226,11 +229,11 @@ function createVEditor0<R>(
 
       // Default to a single column table, showing the value as a string
       let columns: Column<string, string>[] = [
-         {
-            header: cellContent("value"),
-            id: "kind",
-            content: v => cellContent(v.toString()),
-         },
+        {
+          header: cellContent("value"),
+          id: "kind",
+          content: (v) => cellContent(v.toString())
+        }
       ];
       return genericVectorVEditor(factory, columns, valueVEditor);
     }
@@ -238,50 +241,54 @@ function createVEditor0<R>(
     case "stringmap":
       // An veditor over StringMap<T> is implemented in terms of
       // An veditor over sys.types.Map<String,T>
-      type MapType = systypes.MapEntry<string,unknown>[];
-      interface StringMapType {[key:string]: unknown}
+      type MapType = systypes.MapEntry<string, unknown>[];
+      interface StringMapType {
+        [key: string]: unknown;
+      }
       const valueType = adlTree.typeExpr.parameters[0];
-      const underlyingVEditor = mapEntryVectorVEditor(declResolver, ctx, factory, adlrt.texprString(), {value:valueType});
+      const underlyingVEditor = mapEntryVectorVEditor(declResolver, ctx, factory, adlrt.texprString(), {
+        value: valueType
+      });
       const stringMapFromMap = (m: MapType): StringMapType => {
         const result: StringMapType = {};
         for (const me of m) {
           result[me.key] = me.value;
         }
         return result;
-      }
+      };
       const mapFromStringMap = (m: StringMapType): MapType => {
-        return Object.keys(m).map( k => ({key:k, value:m[k]}));
-      }
-      return mappedVEditor(
-        underlyingVEditor,
-        mapFromStringMap,
-        stringMapFromMap,
-      );
+        return Object.keys(m).map((k) => ({ key: k, value: m[k] }));
+      };
+      return mappedVEditor(underlyingVEditor, mapFromStringMap, stringMapFromMap);
   }
 }
 
-function voidVEditor<R>(factory: Factory<R>): IVEditor<null,null,null,R> {
+function voidVEditor<R>(factory: Factory<R>): IVEditor<null, null, null, R> {
   return {
     initialState: null,
     stateFromValue: () => null,
     valueFromState: () => valid(null),
-    update: s => s,
-    render: () => factory.renderVoidEditor(),
+    update: (s) => s,
+    render: () => factory.renderVoidEditor()
   };
 }
 
-function fieldVEditor<T,R>(factory: Factory<R>, _typeExpr: adlast.TypeExpr, fieldfns: FieldFns<T>): IVEditor<T,string,string,R> {
+function fieldVEditor<T, R>(
+  factory: Factory<R>,
+  _typeExpr: adlast.TypeExpr,
+  fieldfns: FieldFns<T>
+): IVEditor<T, string, string, R> {
   function valueFromState(s: string): Validated<T> {
     const err = fieldfns.validate(s);
     return err === null ? valid(fieldfns.fromText(s)) : invalid([err]);
   }
 
-  const veditor: IVEditor<T,string,string,R> = {
+  const veditor: IVEditor<T, string, string, R> = {
     initialState: "",
     stateFromValue: fieldfns.toText,
     valueFromState,
-    update: (_s,e) => e,
-    render: (state, onUpdate) => factory.renderFieldEditor({fieldfns, state, onUpdate}),
+    update: (_s, e) => e,
+    render: (state, onUpdate) => factory.renderFieldEditor({ fieldfns, state, onUpdate })
   };
 
   return veditor;
@@ -305,17 +312,16 @@ type StructEvent = StructFieldEvent;
 
 export type VField<R> = {
   field: adltree.Field;
-  veditor: OVEditor<unknown,R>;
+  veditor: OVEditor<unknown, R>;
 };
-
 
 function structVEditor<R>(
   factory: Factory<R>,
   declResolver: adlrt.DeclResolver,
-  struct: adltree.Struct,
-): IVEditor<unknown, StructState, StructEvent,R> {
-  const fieldDetails = struct.fields.map(field => {
-    const veditor = createVEditor0(declResolver, nullContext,  field.adlTree, factory);
+  struct: adltree.Struct
+): IVEditor<unknown, StructState, StructEvent, R> {
+  const fieldDetails = struct.fields.map((field) => {
+    const veditor = createVEditor0(declResolver, nullContext, field.adlTree, factory);
     const jsonBinding = createJsonBinding<unknown>(declResolver, { value: field.adlTree.typeExpr });
 
     const label = getFormLabelFromAnnotation(declResolver, field.astField) || fieldLabel(field.astField.name);
@@ -324,12 +330,12 @@ function structVEditor<R>(
       default: field.astField.default,
       jsonBinding,
       label,
-      veditor,
+      veditor
     };
   });
 
-  const veditorsByName : Record<string,OVEditor<unknown,R>>  = {};
-  const initialState : StructState = { fieldStates: {} };
+  const veditorsByName: Record<string, OVEditor<unknown, R>> = {};
+  const initialState: StructState = { fieldStates: {} };
 
   // It's unclear what the initialState for an empty struct
   // editor should be... either every field empty, or
@@ -342,17 +348,15 @@ function structVEditor<R>(
   for (const fd of fieldDetails) {
     veditorsByName[fd.name] = fd.veditor;
     if (USE_DEFAULTS_FOR_STRUCT_FIELDS && fd.default.kind === "just") {
-      initialState.fieldStates[fd.name] = fd.veditor.stateFromValue(
-        fd.jsonBinding.fromJsonE(fd.default.value)
-      );
+      initialState.fieldStates[fd.name] = fd.veditor.stateFromValue(fd.jsonBinding.fromJsonE(fd.default.value));
     } else {
       initialState.fieldStates[fd.name] = fd.veditor.initialState;
     }
   }
 
-  function stateFromValue(value: Record<string,unknown>) {
+  function stateFromValue(value: Record<string, unknown>) {
     const state: StructState = {
-      fieldStates: {},
+      fieldStates: {}
     };
     for (const fd of fieldDetails) {
       state.fieldStates[fd.name] = fd.veditor.stateFromValue(value[fd.name]);
@@ -362,7 +366,7 @@ function structVEditor<R>(
 
   function valueFromState(state: StructState): Validated<unknown> {
     let errors: string[] = [];
-    const value: Record<string,unknown> = {};
+    const value: Record<string, unknown> = {};
     for (const fd of fieldDetails) {
       const vv = fd.veditor.valueFromState(state.fieldStates[fd.name]);
       if (!vv.isValid) {
@@ -383,13 +387,10 @@ function structVEditor<R>(
       const newFieldStates = {
         ...state.fieldStates
       };
-      const newfs = veditorsByName[event.field].update(
-        state.fieldStates[event.field],
-        event.fieldEvent
-      );
+      const newfs = veditorsByName[event.field].update(state.fieldStates[event.field], event.fieldEvent);
       newFieldStates[event.field] = newfs;
-      const newState =  {
-        fieldStates: newFieldStates,
+      const newState = {
+        fieldStates: newFieldStates
       };
       return newState;
     } else {
@@ -397,21 +398,18 @@ function structVEditor<R>(
     }
   }
 
-  function render(
-    state: StructState,
-    onUpdate: UpdateFn<StructEvent>
-  ): R {
-    const fields: StructFieldProps<R>[] =  fieldDetails.map(fd => ({
+  function render(state: StructState, onUpdate: UpdateFn<StructEvent>): R {
+    const fields: StructFieldProps<R>[] = fieldDetails.map((fd) => ({
       ...fd,
       veditor: {
         veditor: fd.veditor,
         state: state.fieldStates[fd.name],
-        onUpdate: event => {
+        onUpdate: (event) => {
           onUpdate({ kind: "field", field: fd.name, fieldEvent: event });
         }
       }
-     }));
-    return factory.renderStructEditor({fields});
+    }));
+    return factory.renderStructEditor({ fields });
   }
 
   return {
@@ -430,7 +428,7 @@ export function fieldLabel(name: string): string {
       // insert a space before all caps
       .replace(/([A-Z])/g, " $1")
       // uppercase the first character
-      .replace(/^./, function(str) {
+      .replace(/^./, function (str) {
         return str.toUpperCase();
       })
       // replace _ with space
@@ -438,15 +436,14 @@ export function fieldLabel(name: string): string {
   );
 }
 
-
 interface UnionState {
   currentField: string | null;
-  selectActive: boolean,
+  selectActive: boolean;
   fieldStates: { [key: string]: unknown };
 }
 
 interface UnionToggleActive {
-  kind: "toggleActive",
+  kind: "toggleActive";
 } // Show the dropdown
 interface UnionSetField {
   kind: "switch";
@@ -467,12 +464,10 @@ function unionVEditor<R>(
   factory: Factory<R>,
   declResolver: adlrt.DeclResolver,
   _adlTree: adltree.AdlTree,
-  union: adltree.Union,
-): IVEditor<SomeUnion, UnionState, UnionEvent,R> {
-
-  const fieldDetails = union.fields.map(field => {
-    const formLabel =
-      getFormLabelFromAnnotation(declResolver, field.astField) || fieldLabel(field.astField.name);
+  union: adltree.Union
+): IVEditor<SomeUnion, UnionState, UnionEvent, R> {
+  const fieldDetails = union.fields.map((field) => {
+    const formLabel = getFormLabelFromAnnotation(declResolver, field.astField) || fieldLabel(field.astField.name);
     const ctx = {
       scopedDecl: { moduleName: union.moduleName, decl: union.astDecl },
       field: field.astField
@@ -485,7 +480,7 @@ function unionVEditor<R>(
     };
   });
 
-  const veditorsByName : {[name: string]: () => OVEditor<unknown,R>}= {};
+  const veditorsByName: { [name: string]: () => OVEditor<unknown, R> } = {};
   for (const fd of fieldDetails) {
     veditorsByName[fd.name] = fd.veditor;
   }
@@ -517,7 +512,7 @@ function unionVEditor<R>(
 
     const vv = veditorsByName[kind]().valueFromState(state.fieldStates[kind]);
     if (vv.isValid) {
-      return valid({kind, value: vv.value});
+      return valid({ kind, value: vv.value });
     } else {
       return invalid(vv.errors);
     }
@@ -527,7 +522,7 @@ function unionVEditor<R>(
     if (event.kind === "toggleActive") {
       return {
         ...state,
-        selectActive: !state.selectActive,
+        selectActive: !state.selectActive
       };
     } else if (event.kind === "switch") {
       const field = event.field;
@@ -555,35 +550,34 @@ function unionVEditor<R>(
       return state;
     }
   }
-  
+
   function render(state: UnionState, onUpdate: UpdateFn<UnionEvent>): R {
-    
     let current: number | null = null;
     if (state.currentField) {
-      current = fieldDetails.findIndex(fd => fd.name == state.currentField);
+      current = fieldDetails.findIndex((fd) => fd.name == state.currentField);
     }
 
     const selectState: SelectState = {
       current,
       active: state.selectActive,
-      choices: fieldDetails.map(fd => fd.label),
-      onClick: () => onUpdate({kind:"toggleActive"}),
-      onChoice: (i:number | null) => {
-        onUpdate({kind:"toggleActive"});
-        onUpdate({kind:"switch", field: i === null ? null : fieldDetails[i].name});
-      },
+      choices: fieldDetails.map((fd) => fd.label),
+      onClick: () => onUpdate({ kind: "toggleActive" }),
+      onChoice: (i: number | null) => {
+        onUpdate({ kind: "toggleActive" });
+        onUpdate({ kind: "switch", field: i === null ? null : fieldDetails[i].name });
+      }
     };
-    
-    let veditor: VEditorProps<unknown,unknown,unknown,R> | null = null;
+
+    let veditor: VEditorProps<unknown, unknown, unknown, R> | null = null;
     if (state.currentField) {
       veditor = {
         veditor: veditorsByName[state.currentField](),
         state: state.fieldStates[state.currentField],
-        onUpdate: event => onUpdate({kind:"update",event})
-      }
+        onUpdate: (event) => onUpdate({ kind: "update", event })
+      };
     }
 
-    return factory.renderUnionEditor({selectState,veditor});
+    return factory.renderUnionEditor({ selectState, veditor });
   }
 
   return {
@@ -601,8 +595,8 @@ interface VectorState<T> {
 
 interface VectorSplice<T> {
   kind: "splice";
-  start: number,
-  deleteCount: number,
+  start: number;
+  deleteCount: number;
   values: T[];
 }
 
@@ -610,16 +604,15 @@ type VectorEvent<T> = VectorSplice<T>;
 
 type Vector<T> = T[];
 
-export function genericVectorVEditor<T,R>(
+export function genericVectorVEditor<T, R>(
   factory: Factory<R>,
   columns: Column<T, string>[],
-  valueVEditor: () => OVEditor<T,R>,
+  valueVEditor: () => OVEditor<T, R>
 ): IVEditor<Vector<T>, VectorState<T>, VectorEvent<T>, R> {
-
-  const initialState = { values:[] };
+  const initialState = { values: [] };
 
   function stateFromValue(v: Vector<T>): VectorState<T> {
-    return {values:v};
+    return { values: v };
   }
 
   function valueFromState(state: VectorState<T>): Validated<Vector<T>> {
@@ -629,19 +622,19 @@ export function genericVectorVEditor<T,R>(
   function update(state: VectorState<T>, event: VectorEvent<T>): VectorState<T> {
     let values = [...state.values];
     switch (event.kind) {
-      case 'splice':
+      case "splice":
         values.splice(event.start, event.deleteCount, ...event.values);
         break;
     }
-    return {values};
+    return { values };
   }
 
   function render(state: VectorState<T>, onUpdate: UpdateFn<VectorEvent<T>>): R {
-    const props: VectorEditorProps<T,R> = {
+    const props: VectorEditorProps<T, R> = {
       values: state.values,
       columns,
       valueVEditor,
-      splice: (start, deleteCount, values) => onUpdate({kind: 'splice', start, deleteCount, values: values as T[]}),
+      splice: (start, deleteCount, values) => onUpdate({ kind: "splice", start, deleteCount, values: values as T[] })
     };
     return factory.renderVectorEditor(props);
   }
@@ -656,20 +649,20 @@ export function genericVectorVEditor<T,R>(
 }
 
 export interface MaybeState {
-  isActive: boolean,
-  underlying: unknown,
+  isActive: boolean;
+  underlying: unknown;
 }
 
 // Show the dropdown
 interface MaybeToggleActive {
-  kind: "toggleActive",
+  kind: "toggleActive";
 }
 
 // Update the underlying value
 interface MaybeUpdate {
   kind: "underlying";
   event: unknown;
-} 
+}
 
 type MaybeEvent = MaybeToggleActive | MaybeUpdate;
 
@@ -679,9 +672,8 @@ function maybeVEditor<R>(
   factory: Factory<R>,
   declResolver: adlrt.DeclResolver,
   _adlTree: adltree.AdlTree,
-  union: adltree.Union,
-): IVEditor<SomeMaybe, MaybeState, MaybeEvent,R> {
-
+  union: adltree.Union
+): IVEditor<SomeMaybe, MaybeState, MaybeEvent, R> {
   const field = union.fields[1];
   const ctx = {
     scopedDecl: { moduleName: union.moduleName, decl: union.astDecl },
@@ -689,13 +681,13 @@ function maybeVEditor<R>(
   };
 
   const uveditor = createVEditor0(declResolver, ctx, field.adlTree, factory);
-  const initialState = { isActive:false, underlying: uveditor.initialState};
+  const initialState = { isActive: false, underlying: uveditor.initialState };
 
   function stateFromValue(v: SomeMaybe): MaybeState {
-    if (v.kind == 'nothing') {
+    if (v.kind == "nothing") {
       return initialState;
     } else {
-      return {isActive: true, underlying: uveditor.stateFromValue(v.value)};
+      return { isActive: true, underlying: uveditor.stateFromValue(v.value) };
     }
   }
 
@@ -705,30 +697,30 @@ function maybeVEditor<R>(
       if (!vv.isValid) {
         return vv;
       } else {
-        return valid({kind:"just", value: vv.value});
+        return valid({ kind: "just", value: vv.value });
       }
     } else {
-      return valid({kind:"nothing"});
+      return valid({ kind: "nothing" });
     }
   }
 
   function update(state: MaybeState, event: MaybeEvent): MaybeState {
     switch (event.kind) {
-      case 'toggleActive':
-        return {...state, isActive: !state.isActive};
-      case 'underlying':
-        return {...state, underlying: uveditor.update(state.underlying, event.event)};
+      case "toggleActive":
+        return { ...state, isActive: !state.isActive };
+      case "underlying":
+        return { ...state, underlying: uveditor.update(state.underlying, event.event) };
     }
   }
 
   function render(state: MaybeState, onUpdate: UpdateFn<MaybeEvent>): R {
     return factory.renderMaybeEditor({
-      isActive:state.isActive,
-      toggleIsActive: () => onUpdate({kind:'toggleActive'}),
-      veditor : {
+      isActive: state.isActive,
+      toggleIsActive: () => onUpdate({ kind: "toggleActive" }),
+      veditor: {
         veditor: uveditor,
         state: state.underlying,
-        onUpdate: (event: unknown) => onUpdate({kind:'underlying', event})
+        onUpdate: (event: unknown) => onUpdate({ kind: "underlying", event })
       }
     });
   }
@@ -742,40 +734,47 @@ function maybeVEditor<R>(
   };
 }
 
-
-function unimplementedVEditor<R>(factory: Factory<R>, typeExpr: adlast.TypeExpr): OVEditor<unknown,R> {
-    return {
-      initialState: null,
-      stateFromValue: () => null,
-      valueFromState: () => valid(null),
-      update: () => {},
-      render: () => factory.renderUnimplementedEditor({typeExpr}),
-    };
-  }
+function unimplementedVEditor<R>(factory: Factory<R>, typeExpr: adlast.TypeExpr): OVEditor<unknown, R> {
+  return {
+    initialState: null,
+    stateFromValue: () => null,
+    valueFromState: () => valid(null),
+    update: () => {},
+    render: () => factory.renderUnimplementedEditor({ typeExpr })
+  };
+}
 
 // Create an editor over a Vector<Pair<K,V>>. This won't be required after
 // we update sys.types.Map to have that type
-function mapVEditor<K,V,R>(declResolver: adlrt.DeclResolver, ctx: InternalContext, factory: Factory<R>, ktype: adlrt.ATypeExpr<K>, vtype: adlrt.ATypeExpr<V>): IVEditor<systypes.Pair<K,V>[], unknown, unknown, R> {
-  const map1 = (m: systypes.Pair<K,V>[]): systypes.MapEntry<K,V>[] => {
-    return m.map( p => ({key:p.v1, value:p.v2}) );
-  }
-  const map2 = (m: systypes.MapEntry<K,V>[]): systypes.Pair<K,V>[] => {
-    return m.map( me => ({v1:me.key, v2:me.value}) );
-  }
-  return mappedVEditor(
-    mapEntryVectorVEditor(declResolver, ctx, factory, ktype, vtype),
-    map1,
-    map2,
-  );
+function mapVEditor<K, V, R>(
+  declResolver: adlrt.DeclResolver,
+  ctx: InternalContext,
+  factory: Factory<R>,
+  ktype: adlrt.ATypeExpr<K>,
+  vtype: adlrt.ATypeExpr<V>
+): IVEditor<systypes.Pair<K, V>[], unknown, unknown, R> {
+  const map1 = (m: systypes.Pair<K, V>[]): systypes.MapEntry<K, V>[] => {
+    return m.map((p) => ({ key: p.v1, value: p.v2 }));
+  };
+  const map2 = (m: systypes.MapEntry<K, V>[]): systypes.Pair<K, V>[] => {
+    return m.map((me) => ({ v1: me.key, v2: me.value }));
+  };
+  return mappedVEditor(mapEntryVectorVEditor(declResolver, ctx, factory, ktype, vtype), map1, map2);
 }
 
 // Create an editor over a Vector<MapEntry<K,V>>. This won't be required after
 // we update sys.types.Map to have that type
-function mapEntryVectorVEditor<K,V,R>(declResolver: adlrt.DeclResolver, ctx: InternalContext, factory: Factory<R>, ktype: adlrt.ATypeExpr<K>, vtype: adlrt.ATypeExpr<V>): IVEditor<systypes.MapEntry<K,V>[], unknown, unknown, R> {
-  type MapType = systypes.MapEntry<K,V>[];
-  const mapTypeExpr : adlrt.ATypeExpr<MapType> = adlrt.texprVector(systypes.texprMapEntry(ktype,vtype));
+function mapEntryVectorVEditor<K, V, R>(
+  declResolver: adlrt.DeclResolver,
+  ctx: InternalContext,
+  factory: Factory<R>,
+  ktype: adlrt.ATypeExpr<K>,
+  vtype: adlrt.ATypeExpr<V>
+): IVEditor<systypes.MapEntry<K, V>[], unknown, unknown, R> {
+  type MapType = systypes.MapEntry<K, V>[];
+  const mapTypeExpr: adlrt.ATypeExpr<MapType> = adlrt.texprVector(systypes.texprMapEntry(ktype, vtype));
   const mapAdlTree = adltree.createAdlTree(mapTypeExpr.value, declResolver);
-  return createVEditor0(declResolver, ctx, mapAdlTree, factory) as OVEditor<MapType,R>;
+  return createVEditor0(declResolver, ctx, mapAdlTree, factory) as OVEditor<MapType, R>;
 }
 
 function createFieldForTParam0<R>(
@@ -794,11 +793,7 @@ function createFieldForTParam0<R>(
   return createField(adlTree1, ctx1, factory);
 }
 
-function createField<R>(
-  adlTree: adltree.AdlTree,
-  ctx: CustomContext,
-  factory: Factory<R>,
-): FieldFns<unknown> | null {
+function createField<R>(adlTree: adltree.AdlTree, ctx: CustomContext, factory: Factory<R>): FieldFns<unknown> | null {
   let fieldfns = createField1(adlTree, ctx, factory);
   if (fieldfns === null) {
     // Try resolving through any typedefs or newtypes
@@ -808,11 +803,7 @@ function createField<R>(
   return fieldfns;
 }
 
-function createField1<R>(
-  adlTree: adltree.AdlTree,
-  ctx: CustomContext,
-  factory: Factory<R>,
-): FieldFns<unknown> | null {
+function createField1<R>(adlTree: adltree.AdlTree, ctx: CustomContext, factory: Factory<R>): FieldFns<unknown> | null {
   if (factory) {
     const customField = factory.getCustomField(ctx);
     if (customField) {
@@ -831,25 +822,23 @@ function createField1<R>(
 
 /// Map a value editor from type A to a corresponding value
 /// editor over type B.
-export function mappedVEditor<A,B,S,E,R>(
-  veditor: IVEditor<A,S,E,R>,
-  aFromB: (b:B) => A,
-  bFromA: (a:A) => B
-  ) : IVEditor<B,S,E,R> {
+export function mappedVEditor<A, B, S, E, R>(
+  veditor: IVEditor<A, S, E, R>,
+  aFromB: (b: B) => A,
+  bFromA: (a: A) => B
+): IVEditor<B, S, E, R> {
   return {
     initialState: veditor.initialState,
-    stateFromValue: (b:B) => veditor.stateFromValue(aFromB(b)),
-    valueFromState: (s:S) => mapValidated( bFromA, veditor.valueFromState(s)),
+    stateFromValue: (b: B) => veditor.stateFromValue(aFromB(b)),
+    valueFromState: (s: S) => mapValidated(bFromA, veditor.valueFromState(s)),
     update: veditor.update,
-    render: veditor.render,
+    render: veditor.render
   };
 }
 
 function isEnum(fields: adltree.Field[]): boolean {
   for (const f of fields) {
-    const isVoid =
-      f.astField.typeExpr.typeRef.kind === "primitive" &&
-      f.astField.typeExpr.typeRef.value === "Void";
+    const isVoid = f.astField.typeExpr.typeRef.kind === "primitive" && f.astField.typeExpr.typeRef.value === "Void";
     if (!isVoid) {
       return false;
     }
@@ -859,44 +848,42 @@ function isEnum(fields: adltree.Field[]): boolean {
 
 function isMaybe(typeExpr: adlast.TypeExpr): boolean {
   if (typeExpr.typeRef.kind === "reference") {
-    return (
-      typeExpr.typeRef.value.moduleName === "sys.types" && typeExpr.typeRef.value.name === "Maybe"
-    );
+    return typeExpr.typeRef.value.moduleName === "sys.types" && typeExpr.typeRef.value.name === "Maybe";
   }
   return false;
 }
 
 function maybeFromNullable<T>(value: T | null): systypes.Maybe<T> {
   if (value === null) {
-    return {kind:'nothing'}
+    return { kind: "nothing" };
   } else {
-    return {kind: 'just', value}
+    return { kind: "just", value };
   }
 }
 
 // This function only works for types T which don't have null as
 // a value.
 function nullableFromMaybe<T>(value: systypes.Maybe<T>): T | null {
-  if (value.kind === 'just') {
+  if (value.kind === "just") {
     return value.value;
   } else {
-    return null
+    return null;
   }
 }
 
-function unionFromEnum(ev : string): {kind:string, value:unknown} {
-  return {kind:ev, value:null};
+function unionFromEnum(ev: string): { kind: string; value: unknown } {
+  return { kind: ev, value: null };
 }
 
-function enumFromUnion(uv: {kind:string, value:unknown}) : string {
+function enumFromUnion(uv: { kind: string; value: unknown }): string {
   return uv.kind;
 }
 
 // Extend a veditor with some additional validation
-export function validatedVEditor<A,S,E,R>(
-  veditor: IVEditor<A,S,E,R>,
-  extraValidator: (v:A) => Validated<A>,
-  ) : IVEditor<A,S,E,R> {
+export function validatedVEditor<A, S, E, R>(
+  veditor: IVEditor<A, S, E, R>,
+  extraValidator: (v: A) => Validated<A>
+): IVEditor<A, S, E, R> {
   return {
     initialState: veditor.initialState,
     stateFromValue: veditor.stateFromValue,
@@ -909,7 +896,6 @@ export function validatedVEditor<A,S,E,R>(
       }
     },
     update: veditor.update,
-    render: veditor.render,
+    render: veditor.render
   };
 }
-

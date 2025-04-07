@@ -19,7 +19,6 @@ export const stringFieldFns: FieldFns<string> = {
 
 export const STRING_FIELD: FieldFns<string> = stringFieldFns;
 
-
 // A string field constrained by a regex
 //
 // If the regex contains capture groups, the field result will be the value
@@ -61,7 +60,7 @@ export const NON_EMPTY_MULTILINE_STRING_FIELD: FieldFns<string> = regexStringFie
 // A bounded integer field
 
 export function intFieldFns(minValue: number | null, maxValue: number | null): FieldFns<number> {
-  const re = new RegExp('^\\s*[+-]?\\d+\\s*$');
+  const re = new RegExp("^\\s*[+-]?\\d+\\s*$");
   return {
     toText(v) {
       return "" + v;
@@ -91,10 +90,9 @@ export function intFieldFns(minValue: number | null, maxValue: number | null): F
   };
 }
 
-
 // An arbitrary number
 export function numberFieldFns(minValue: number | null, maxValue: number | null): FieldFns<number> {
-  const re = new RegExp('^\\s*[+-]?\\d+(\\.\\d+)?\\s*$');
+  const re = new RegExp("^\\s*[+-]?\\d+(\\.\\d+)?\\s*$");
   return {
     toText(v) {
       return "" + v;
@@ -103,9 +101,9 @@ export function numberFieldFns(minValue: number | null, maxValue: number | null)
       if (text.match(re)) {
         const v = parseFloat(text);
         if (!isNaN(v)) {
-          if (typeof (minValue) === 'number' && v < minValue) {
+          if (typeof minValue === "number" && v < minValue) {
             return `value too small (min ${minValue})`;
-          } else if (typeof (maxValue) === 'number' && v > maxValue) {
+          } else if (typeof maxValue === "number" && v > maxValue) {
             return `value too big (max ${maxValue})`;
           } else {
             return null;
@@ -125,15 +123,13 @@ export function numberFieldFns(minValue: number | null, maxValue: number | null)
 
 export const NUMBER_FIELD: FieldFns<number> = numberFieldFns(null, null);
 
-
 // A BigDecimal field, which is stored as a string
 // but must be validated as a number
 export function bigDecimalFieldFns(): FieldFns<string> {
-  return regexStringFieldFns('^\\s*(-?(?:\\d+(?:\\.\\d+)?|\\.\\d+))\\s*$', "a decimal value", 1);
+  return regexStringFieldFns("^\\s*(-?(?:\\d+(?:\\.\\d+)?|\\.\\d+))\\s*$", "a decimal value", 1);
 }
 
 export const BIG_DECIMAL_STRING_FIELD: FieldFns<string> = bigDecimalFieldFns();
-
 
 // A boolean field
 
@@ -160,7 +156,6 @@ export function boolFieldFns(): FieldFns<boolean> {
 }
 
 export const BOOLEAN_FIELD: FieldFns<boolean> = boolFieldFns();
-
 
 // A Json field
 
@@ -190,8 +185,11 @@ export const JSON_FIELD: FieldFns<unknown> = jsonFieldFns();
 
 // An email address field
 // See  https://stackoverflow.com/questions/201323/how-to-validate-an-email-address-using-a-regular-expression
-export const EMAIL_FIELD: FieldFns<string> = regexStringFieldFns("^\\s*((?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|\"(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])*\")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21-\\x5a\\x53-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])+)\\]))\\s*$", "an email address", 1);
-
+export const EMAIL_FIELD: FieldFns<string> = regexStringFieldFns(
+  "^\\s*((?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|\"(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])*\")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21-\\x5a\\x53-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])+)\\]))\\s*$",
+  "an email address",
+  1
+);
 
 interface Mapping<T> {
   value: T;
@@ -206,7 +204,7 @@ export function labelledValuesFieldFns<T>(
   mappings: Mapping<T>[]
 ): FieldFns<T> {
   const labelmap: { [key: string]: T } = {};
-  mappings.forEach(m => {
+  mappings.forEach((m) => {
     labelmap[m.label] = m.value;
   });
 
@@ -236,7 +234,6 @@ export function labelledValuesFieldFns<T>(
     toText,
     validate,
     fromText,
-    equals,
+    equals
   };
 }
-

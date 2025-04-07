@@ -11,15 +11,7 @@ export interface AdlTree {
   details: Lazy<AdlTreeDetails>;
 }
 
-export type AdlTreeDetails =
-  | Primitive
-  | Vector
-  | StringMap
-  | Nullable
-  | Struct
-  | Union
-  | NewType
-  | TypeDef;
+export type AdlTreeDetails = Primitive | Vector | StringMap | Nullable | Struct | Union | NewType | TypeDef;
 
 export interface Primitive {
   kind: "primitive";
@@ -116,10 +108,7 @@ export function createAdlTree(typeExpr: ast.TypeExpr, declResolver: DeclResolver
               kind: "struct",
               moduleName: scopedDecl.moduleName,
               astDecl: scopedDecl.decl,
-              fields: mkFields(
-                struct.fields,
-                mkTParamBindings(tParamBindings, struct.typeParams, typeExpre.parameters)
-              )
+              fields: mkFields(struct.fields, mkTParamBindings(tParamBindings, struct.typeParams, typeExpre.parameters))
             };
           case "union_":
             const union = scopedDecl.decl.type_.value;
@@ -127,10 +116,7 @@ export function createAdlTree(typeExpr: ast.TypeExpr, declResolver: DeclResolver
               kind: "union",
               moduleName: scopedDecl.moduleName,
               astDecl: scopedDecl.decl,
-              fields: mkFields(
-                union.fields,
-                mkTParamBindings(tParamBindings, union.typeParams, typeExpre.parameters)
-              )
+              fields: mkFields(union.fields, mkTParamBindings(tParamBindings, union.typeParams, typeExpre.parameters))
             };
           case "type_":
             const typedef = scopedDecl.decl.type_.value;
@@ -171,10 +157,7 @@ export function createAdlTree(typeExpr: ast.TypeExpr, declResolver: DeclResolver
     };
   }
 
-  function substituteTParams(
-    typeExpre: ast.TypeExpr,
-    tParamBindings: TParamBindings
-  ): ast.TypeExpr {
+  function substituteTParams(typeExpre: ast.TypeExpr, tParamBindings: TParamBindings): ast.TypeExpr {
     return typeExpre.typeRef.kind === "typeParam"
       ? tParamBindings[typeExpre.typeRef.value]
       : {
@@ -184,13 +167,9 @@ export function createAdlTree(typeExpr: ast.TypeExpr, declResolver: DeclResolver
         };
   }
 
-  function mkTParamBindings(
-    existing: TParamBindings,
-    idents: string[],
-    typeExprs: ast.TypeExpr[]
-  ): TParamBindings {
-    const sTypeExprs = typeExprs.map(t => substituteTParams(t, existing));
-    const newBindings: Record<string,ast.TypeExpr> = {};
+  function mkTParamBindings(existing: TParamBindings, idents: string[], typeExprs: ast.TypeExpr[]): TParamBindings {
+    const sTypeExprs = typeExprs.map((t) => substituteTParams(t, existing));
+    const newBindings: Record<string, ast.TypeExpr> = {};
     Object.assign(newBindings, existing);
     idents.forEach((ident, i) => {
       newBindings[ident] = sTypeExprs[i];
@@ -199,7 +178,7 @@ export function createAdlTree(typeExpr: ast.TypeExpr, declResolver: DeclResolver
   }
 
   function mkFields(fields: ast.Field[], tParamBindings: TParamBindings): Field[] {
-    return fields.map(field => ({
+    return fields.map((field) => ({
       astField: field,
       adlTree: mkTree(field.typeExpr, tParamBindings)
     }));
@@ -209,11 +188,7 @@ export function createAdlTree(typeExpr: ast.TypeExpr, declResolver: DeclResolver
 }
 
 // Get the details of an ADL tree, resolving newtypes and typedefs if requested.
-export function resolve(
-  adlTree: AdlTree,
-  followTypedefs: boolean,
-  followNewTypes: boolean
-): AdlTree {
+export function resolve(adlTree: AdlTree, followTypedefs: boolean, followNewTypes: boolean): AdlTree {
   const details = adlTree.details();
   if (details.kind === "typedef" && followTypedefs) {
     return resolve(details.adlTree, followTypedefs, followNewTypes);

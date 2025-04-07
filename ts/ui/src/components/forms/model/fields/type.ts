@@ -1,6 +1,5 @@
 // A record mapping a value of type T to a text field
 export interface FieldFns<T> {
-
   // Convert a value to the text content
   toText(value: T): string;
 
@@ -14,4 +13,3 @@ export interface FieldFns<T> {
   // Returns true if two values are equals
   equals(v1: T, v2: T): boolean;
 }
-

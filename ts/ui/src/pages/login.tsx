@@ -1,17 +1,17 @@
-import Container from '@mui/material/Container';
-import Typography from '@mui/material/Typography';
-import Box from '@mui/material/Box';
-import { useTypedFieldState } from '@/components/forms/model/fields/hooks';
-import { EMAIL_FIELD, NON_EMPTY_STRING_FIELD } from '@/components/forms/model/fields/primitive';
-import { TextField } from '@mui/material';
-import { AsyncLoadingButton } from '@/components/Button';
-import { useAppState } from '@/hooks/use-app-state';
-import { useState } from 'react';
-import { useNavigate } from 'raviger';
-import { messagesUrl } from '@/navigation';
+import Container from "@mui/material/Container";
+import Typography from "@mui/material/Typography";
+import Box from "@mui/material/Box";
+import { useTypedFieldState } from "@/components/forms/model/fields/hooks";
+import { EMAIL_FIELD, NON_EMPTY_STRING_FIELD } from "@/components/forms/model/fields/primitive";
+import { TextField } from "@mui/material";
+import { AsyncLoadingButton } from "@/components/Button";
+import { useAppState } from "@/hooks/use-app-state";
+import { useState } from "react";
+import { useNavigate } from "raviger";
+import { messagesUrl } from "@/navigation";
 
 export function Login() {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const appState = useAppState();
   const email = useTypedFieldState(EMAIL_FIELD);
   const password = useTypedFieldState(NON_EMPTY_STRING_FIELD);
@@ -20,9 +20,9 @@ export function Login() {
 
   async function onLogin() {
     if (formValid) {
-      const resp = await appState.api.login({email: email.value(), password: password.value()});
+      const resp = await appState.api.login({ email: email.value(), password: password.value() });
       appState.setAuthStateFromLogin(resp);
-      if (resp.kind === 'tokens') {
+      if (resp.kind === "tokens") {
         navigate(messagesUrl());
       }
     } else {
@@ -45,7 +45,7 @@ export function Login() {
           type="email"
           sx={{ mb: 3 }}
           fullWidth
-          onChange={e => email.setText(e.target.value)}
+          onChange={(e) => email.setText(e.target.value)}
           value={email.text}
           error={showErrors && !email.isValid()}
           helperText={showErrors && email.validationError()}
@@ -57,19 +57,17 @@ export function Login() {
           variant="outlined"
           color="secondary"
           type="password"
-          onChange={e => password.setText(e.target.value)}
+          onChange={(e) => password.setText(e.target.value)}
           value={password.text}
           error={showErrors && !password.isValid()}
           helperText={showErrors && password.validationError()}
           fullWidth
           sx={{ mb: 3 }}
-        />      
+        />
 
-        {appState.authState.kind === 'authfailed' && 
-          <Box sx={{marginBottom: "15px", color: 'red'}}>
-            Incorrect username/password.
-          </Box>
-        }
+        {appState.authState.kind === "authfailed" && (
+          <Box sx={{ marginBottom: "15px", color: "red" }}>Incorrect username/password.</Box>
+        )}
 
         <AsyncLoadingButton variant="contained" onClick={onLogin}>
           Login

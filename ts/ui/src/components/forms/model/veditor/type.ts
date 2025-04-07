@@ -23,27 +23,23 @@ export interface IVEditor<T, S, E, R> {
   render(state: S, onUpdate: UpdateFn<E>): R;
 }
 
-export type  Validated<T>
-  = {isValid: false, errors: string[]}
-  | {isValid: true, value: T}
-  ;
+export type Validated<T> = { isValid: false; errors: string[] } | { isValid: true; value: T };
 
 export type UpdateFn<E> = (e: E) => void;
 
 // An opaque value editor, where the internal implementation types
-// need not be known. 
-export type OVEditor<T,R> = IVEditor<T,unknown,unknown,R>;
-
+// need not be known.
+export type OVEditor<T, R> = IVEditor<T, unknown, unknown, R>;
 
 export function valid<T>(value: T): Validated<T> {
-  return {isValid: true, value};
+  return { isValid: true, value };
 }
 
 export function invalid<T>(errors: string[]): Validated<T> {
-  return {isValid: false, errors};
+  return { isValid: false, errors };
 }
 
-export function mapValidated<A,B>(fn: (a:A) => B, vv: Validated<A>): Validated<B> {
+export function mapValidated<A, B>(fn: (a: A) => B, vv: Validated<A>): Validated<B> {
   if (!vv.isValid) {
     return vv;
   }

@@ -1,7 +1,6 @@
 {
   "printWidth": 120,
   "bracketSameLine": true,
-  "trailingComma": "none",
   "htmlWhitespaceSensitivity": "ignore",
   "quoteProps": "consistent"
 }

@@ -54,12 +54,7 @@ export interface TableFactory {
   tableRow(i: number, cells: JSX.Element[], style: string): JSX.Element;
 
   headerCell(i: number, content: CellContent, popupContent: JSX.Element | null): JSX.Element;
-  tableCell(
-    i: number,
-    onClick: () => void,
-    content: CellContent,
-    popupContent: JSX.Element | null
-  ): JSX.Element;
+  tableCell(i: number, onClick: () => void, content: CellContent, popupContent: JSX.Element | null): JSX.Element;
 }
 
 export interface AdlColumn<T> {
@@ -101,16 +96,15 @@ export function getAdlTableInfo<T>(
 
   const columns: AdlColumn<unknown>[] = [];
 
-  adlStruct.fields.forEach(f => {
+  adlStruct.fields.forEach((f) => {
     const fieldfns = getFieldFns(declResolver, scopedDecl, f.astField, f.adlTree, customFields);
     if (fieldfns !== null) {
       const fieldfnsT: FieldFns<unknown> = fieldfns;
-      const defaultVisible =  true;
-      const label =
-        getFormLabelFromAnnotation(declResolver, f.astField) || fieldLabel(f.astField.name);
+      const defaultVisible = true;
+      const label = getFormLabelFromAnnotation(declResolver, f.astField) || fieldLabel(f.astField.name);
 
       // A column containing multi line strings
-      const content = (item: {[key : string] : unknown}): CellContent => {
+      const content = (item: { [key: string]: unknown }): CellContent => {
         const text = fieldfnsT.toText(item[f.astField.name]);
         // show max 40 characters of the first line
         const s = text;
@@ -136,8 +130,8 @@ export function getAdlTableInfo<T>(
     }
   });
 
-  const columnsByFieldName : {[key: string] : AdlColumn<unknown>}= {};
-  columns.forEach(c => {
+  const columnsByFieldName: { [key: string]: AdlColumn<unknown> } = {};
+  columns.forEach((c) => {
     columnsByFieldName[c.fieldname] = c;
   });
 
@@ -162,7 +156,7 @@ export function getFieldFns(
   if (fdetails.kind === "typedef") {
     return getFieldFns(declResolver, scopedDecl, field, fdetails.adlTree, customFields);
   } else if (fdetails.kind === "newtype") {
-      return getFieldFns(declResolver, scopedDecl, field, fdetails.adlTree, customFields);
+    return getFieldFns(declResolver, scopedDecl, field, fdetails.adlTree, customFields);
   } else if (fdetails.kind === "primitive") {
     return adlPrimitiveFieldFns(fdetails.ptype);
   } else if (fdetails.kind === "nullable") {
@@ -171,11 +165,7 @@ export function getFieldFns(
       return null;
     }
     return nullableField(fieldfns);
-  } else if (
-    fdetails.kind === "union" &&
-    fdetails.moduleName === "sys.types" &&
-    fdetails.astDecl.name === "Maybe"
-  ) {
+  } else if (fdetails.kind === "union" && fdetails.moduleName === "sys.types" && fdetails.astDecl.name === "Maybe") {
     const t2 = adltree.createAdlTree(t.typeExpr.parameters[0], declResolver);
     const fieldfns = getFieldFns(declResolver, scopedDecl, field, t2, customFields);
     if (fieldfns === null) {
@@ -191,4 +181,3 @@ export function getFieldFns(
   }
   return null;
 }
-

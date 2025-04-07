@@ -6,27 +6,29 @@ import { Login } from "./pages/login";
 import { ApiWorkbench } from "./pages/api-workbench";
 
 export const ROUTES = {
-  '/': () => <Landing />,
-  '/login': () => <Login />,
-  '/logout': () => <Logout/>,
-  '/messages': () => <RequireLogin><Messages/></RequireLogin>,
-  '/api-workbench': () =><ApiWorkbench/>,
+  "/": () => <Landing />,
+  "/login": () => <Login />,
+  "/logout": () => <Logout />,
+  "/messages": () => (
+    <RequireLogin>
+      <Messages />
+    </RequireLogin>
+  ),
+  "/api-workbench": () => <ApiWorkbench />
 };
 
-
 export function landingUrl(): string {
-  return '/';
+  return "/";
 }
 
 export function loginUrl(): string {
-  return '/login';
+  return "/login";
 }
 
 export function logoutUrl(): string {
-  return '/logout';
+  return "/logout";
 }
 
 export function messagesUrl(): string {
-  return '/messages';
+  return "/messages";
 }
-

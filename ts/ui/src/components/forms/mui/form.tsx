@@ -1,5 +1,5 @@
-import  { useState } from "react";
-import { isJsonParseException, JsonBinding } from '@adllang/adl-runtime';
+import { useState } from "react";
+import { isJsonParseException, JsonBinding } from "@adllang/adl-runtime";
 import { Toggle } from "./toggle";
 import { VEditor } from "./veditor";
 import { Button, styled, TextField } from "@mui/material";
@@ -9,7 +9,7 @@ import { Button, styled, TextField } from "@mui/material";
 // input.
 
 export interface AdlFormProps<T> {
-  state: AdlFormState<T>,
+  state: AdlFormState<T>;
   onCancel?(): void;
   onClose?(): void;
   onApply?(value: T): void;
@@ -18,9 +18,9 @@ export interface AdlFormProps<T> {
 }
 
 export interface AdlFormState<T> {
-  value0:  T | undefined;
-  veditor: VEditor<T>, 
-  jsonBinding: JsonBinding<T> | undefined,
+  value0: T | undefined;
+  veditor: VEditor<T>;
+  jsonBinding: JsonBinding<T> | undefined;
 
   veditorState: unknown;
   rawState: string;
@@ -29,8 +29,8 @@ export interface AdlFormState<T> {
   formValidation: FormValidation;
 
   setValue0(value: T | undefined): void;
-  setMode(mode:Mode): void,
-  setVEditorState(state:unknown): void;
+  setMode(mode: Mode): void;
+  setVEditorState(state: unknown): void;
   setRawState(state: unknown): void;
   setFormValidation(formValidation: FormValidation): void;
 }
@@ -58,42 +58,38 @@ interface FormValidated {
 
 type FormValidation = AwaitingValidation | FormError | FormValidated;
 
-
 export function useAdlFormState<T>(params: {
-    value0?: T, 
-    veditor: VEditor<T>, 
-    jsonBinding?: JsonBinding<T>,
-  }): AdlFormState<T> {
-
-  const [value0, _setValue0] = useState<T|undefined>(params.value0);
+  value0?: T;
+  veditor: VEditor<T>;
+  jsonBinding?: JsonBinding<T>;
+}): AdlFormState<T> {
+  const [value0, _setValue0] = useState<T | undefined>(params.value0);
   const [pristine, setPristine] = useState<boolean>(true);
   const [veditorState, _setVEditorState] = useState<unknown>(() => makeVeditorState(params.value0));
   const [rawState, _setRawState] = useState<string>(() => makeRawState(params.value0));
   const [mode, setMode] = useState<Mode>(Mode.VE);
-  const [formValidation, _setFormValidation] = useState<FormValidation>({type: "ok",validationSeq: 0});
+  const [formValidation, _setFormValidation] = useState<FormValidation>({ type: "ok", validationSeq: 0 });
 
   function makeVeditorState(v: T | undefined): unknown {
-    return v === undefined
-    ? params.veditor.initialState
-    : params.veditor.stateFromValue(v);
+    return v === undefined ? params.veditor.initialState : params.veditor.stateFromValue(v);
   }
 
   function makeRawState(v: T | undefined): string {
-    return params.jsonBinding && v != undefined ? JSON.stringify(params.jsonBinding.toJson(v), null, 2) : ""
+    return params.jsonBinding && v != undefined ? JSON.stringify(params.jsonBinding.toJson(v), null, 2) : "";
   }
 
   function setValue0(v: T | undefined) {
     _setValue0(v);
-    _setFormValidation({type: "ok",validationSeq: 0});
+    _setFormValidation({ type: "ok", validationSeq: 0 });
     _setVEditorState(makeVeditorState(v));
     _setRawState(makeRawState(v));
     setPristine(true);
-  } 
+  }
 
   function setVEditorState(state: unknown) {
     _setVEditorState(state);
     setPristine(false);
-  } 
+  }
 
   function setRawState(state: string) {
     _setRawState(state);
@@ -123,9 +119,7 @@ export function useAdlFormState<T>(params: {
   };
 }
 
-
 export const AdlForm = (props: AdlFormProps<unknown>) => {
-
   const state = props.state;
 
   function onToggleMode() {
@@ -156,12 +150,9 @@ export const AdlForm = (props: AdlFormProps<unknown>) => {
         break;
       default:
     }
-  };
+  }
 
-
-  const parseRawText = (
-    text: string
-  ): { kind: "error"; error: string } | { kind: "value"; value: unknown } => {
+  const parseRawText = (text: string): { kind: "error"; error: string } | { kind: "value"; value: unknown } => {
     try {
       const jv = JSON.parse(text);
       if (state.jsonBinding) {
@@ -184,7 +175,7 @@ export const AdlForm = (props: AdlFormProps<unknown>) => {
     const newVEditorState = state.veditor.update(state.veditorState, event);
     state.setVEditorState(newVEditorState);
     void validateForm(newVEditorState);
-  }
+  };
 
   const validateForm = async (adlState: unknown) => {
     const vv = state.veditor.valueFromState(adlState);
@@ -192,8 +183,8 @@ export const AdlForm = (props: AdlFormProps<unknown>) => {
     if (vv.isValid && props.validate && state.mode === Mode.VE) {
       const validationSeq = state.formValidation.validationSeq + 1;
       state.setFormValidation({
-          type: "awaiting",
-          validationSeq
+        type: "awaiting",
+        validationSeq
       });
       console.log("awaiting validation of ", vv.value);
       const error: string | undefined = await props.validate(vv.value);
@@ -204,15 +195,14 @@ export const AdlForm = (props: AdlFormProps<unknown>) => {
           error,
           validationSeq
         });
-
       } else {
         state.setFormValidation({
           type: "ok",
           validationSeq
         });
-      }  
+      }
     }
-  }
+  };
 
   const onApply = () => {
     let value: unknown = null;
@@ -235,7 +225,7 @@ export const AdlForm = (props: AdlFormProps<unknown>) => {
       props.onApply(value);
       state.setValue0(value);
     }
-  }
+  };
 
   let errors: string[] = [];
   let renderedEditor: JSX.Element | null = null;
@@ -244,28 +234,21 @@ export const AdlForm = (props: AdlFormProps<unknown>) => {
     case Mode.VE:
       const vv = state.veditor.valueFromState(state.veditorState);
       errors = !vv.isValid ? vv.errors : [];
-      renderedEditor = <FormVEditor 
-        veditor={state.veditor}
-        veditorState={state.veditorState}
-        disabled={props.disabled}
-        onUpdate={onUpdate}
-      />;
+      renderedEditor = (
+        <FormVEditor
+          veditor={state.veditor}
+          veditorState={state.veditorState}
+          disabled={props.disabled}
+          onUpdate={onUpdate}
+        />
+      );
       break;
     case Mode.RAW:
       const result = parseRawText(state.rawState);
-      const error =
-        result.kind === "error" ? (
-          <ErrLabel>
-            {result.error}
-          </ErrLabel>
-        ) : null;
+      const error = result.kind === "error" ? <ErrLabel>{result.error}</ErrLabel> : null;
       renderedEditor = (
         <div>
-            <RawJsonEditor
-              disabled={props.disabled}
-              value={state.rawState}
-              onChange={state.setRawState}
-            />
+          <RawJsonEditor disabled={props.disabled} value={state.rawState} onChange={state.setRawState} />
           {error}
         </div>
       );
@@ -281,9 +264,8 @@ export const AdlForm = (props: AdlFormProps<unknown>) => {
       return (
         <Button
           variant="contained"
-          disabled={errors.length > 0 || state.formValidation.type !== 'ok'}
-          onClick={onApply}
-        >
+          disabled={errors.length > 0 || state.formValidation.type !== "ok"}
+          onClick={onApply}>
           Apply
         </Button>
       );
@@ -293,7 +275,9 @@ export const AdlForm = (props: AdlFormProps<unknown>) => {
   function closeButton() {
     if (props.onClose) {
       return (
-        <Button variant="contained" onClick={props.onClose}>Close</Button>
+        <Button variant="contained" onClick={props.onClose}>
+          Close
+        </Button>
       );
     }
   }
@@ -301,100 +285,86 @@ export const AdlForm = (props: AdlFormProps<unknown>) => {
   function cancelButton() {
     if (props.onCancel) {
       return (
-        <Button variant="outlined" onClick={props.onCancel}>Cancel</Button>
+        <Button variant="outlined" onClick={props.onCancel}>
+          Cancel
+        </Button>
       );
     }
   }
-  
 
   let rawToggle: JSX.Element | null = null;
   if (state.jsonBinding) {
-    rawToggle = (
-      <Toggle
-        onChange={onToggleMode}
-        checked={state.mode === Mode.RAW}
-      />
-    );
+    rawToggle = <Toggle onChange={onToggleMode} checked={state.mode === Mode.RAW} />;
   }
 
   let formError: JSX.Element | null = null;
   if (state.formValidation.type === "error") {
     formError = (
       <div style={{ margin: "20px" }}>
-        <ErrLabel>
-          {state.formValidation.error}
-        </ErrLabel>
+        <ErrLabel>{state.formValidation.error}</ErrLabel>
       </div>
     );
   }
 
   return (
-      <div>
-        <div style={{ margin: "20px" }}>{renderedEditor}</div>
-        {formError}
-        <ActionBar>
-          { rawToggle &&
-            <ActionGroup>
-              Edit raw
-              {rawToggle}
-            </ActionGroup>
-          }
+    <div>
+      <div style={{ margin: "20px" }}>{renderedEditor}</div>
+      {formError}
+      <ActionBar>
+        {rawToggle && (
           <ActionGroup>
-            {cancelButton()}
-            {closeButton()}
-            {applyButton()}
+            Edit raw
+            {rawToggle}
           </ActionGroup>
-
-        </ActionBar>
-      </div>
+        )}
+        <ActionGroup>
+          {cancelButton()}
+          {closeButton()}
+          {applyButton()}
+        </ActionGroup>
+      </ActionBar>
+    </div>
   );
-}
+};
 
 function FormVEditor(props: {
-  veditor: VEditor<unknown>,
-  veditorState: unknown,
-  disabled?: boolean,
-  onUpdate: (ev:unknown) => void,
+  veditor: VEditor<unknown>;
+  veditorState: unknown;
+  disabled?: boolean;
+  onUpdate: (ev: unknown) => void;
 }) {
-  const rendered = props.veditor.render(
-    props.veditorState,
-    props.onUpdate
-  )({disabled: !!props.disabled});
+  const rendered = props.veditor.render(props.veditorState, props.onUpdate)({ disabled: !!props.disabled });
   return rendered.element();
 }
 
-const ErrLabel = styled('label')({
-  color: 'red',
+const ErrLabel = styled("label")({
+  color: "red"
 });
 
-const ActionBar = styled('div')({
-  display: 'flex',
-  flexDirection: 'row',
-  justifyContent: 'space-between',
+const ActionBar = styled("div")({
+  display: "flex",
+  flexDirection: "row",
+  justifyContent: "space-between"
 });
 
-const ActionGroup = styled('div')({
-  display: 'flex',
-  flexDirection: 'row',
-  justifyContent: 'space-between',
-  alignItems: 'center',
-  gap: '10px',
-  marginLeft: '20px',
+const ActionGroup = styled("div")({
+  display: "flex",
+  flexDirection: "row",
+  justifyContent: "space-between",
+  alignItems: "center",
+  gap: "10px",
+  marginLeft: "20px"
 });
 
-const RawJsonEditor = (props: {
-  disabled?: boolean,
-  value: string,
-  onChange: (s: string) => void
-}) =>  {
-  return <TextField
-    fullWidth
-    multiline
-    minRows={5}
-    maxRows={10}
-    disabled={props.disabled}
-    value={props.value}
-    onChange={ev => props.onChange(ev.target.value)}
-  >
-  </TextField>;
-}
+const RawJsonEditor = (props: { disabled?: boolean; value: string; onChange: (s: string) => void }) => {
+  return (
+    <TextField
+      fullWidth
+      multiline
+      minRows={5}
+      maxRows={10}
+      disabled={props.disabled}
+      value={props.value}
+      onChange={(ev) => props.onChange(ev.target.value)}></TextField>
+  );
+};

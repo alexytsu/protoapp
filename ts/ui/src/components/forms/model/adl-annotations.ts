@@ -14,7 +14,7 @@ export function getAnnotation<T>(
 ): T | null {
   for (const ann of anns) {
     const te: adlast.TypeExpr = {
-      typeRef: { kind: "reference", value: ann.key},
+      typeRef: { kind: "reference", value: ann.key },
       parameters: []
     };
     if (typeExprsEqual(te, jsonBinding.typeExpr)) {
@@ -24,26 +24,19 @@ export function getAnnotation<T>(
   return null;
 }
 
-export function getGroupKeyFromAnnotation(
-  dresolver: DeclResolver,
-  annotations: adlast.Annotations,
-): string | null {
+export function getGroupKeyFromAnnotation(dresolver: DeclResolver, annotations: adlast.Annotations): string | null {
   const jb = createJsonBinding(dresolver, ui.texprFormGroupKey());
   return getAnnotation(annotations, jb);
 }
 
-export function getFormLabelFromAnnotation(
-  dresolver: DeclResolver,
-  field: adlast.Field
-): string | null {
+export function getFormLabelFromAnnotation(dresolver: DeclResolver, field: adlast.Field): string | null {
   const jb = createJsonBinding(dresolver, ui.texprFormLabel());
   return getAnnotation(field.annotations, jb);
 }
 
-
 export function getFormGroupsFromAnnotation(
   dresolver: DeclResolver,
-  annotations: adlast.Annotations,
+  annotations: adlast.Annotations
 ): ui.FormGroups | null {
   const jb = createJsonBinding(dresolver, ui.texprFormGroups());
   return getAnnotation(annotations, jb);

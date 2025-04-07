@@ -3,14 +3,10 @@ import * as API from "@protoapp/adl/protoapp/apis/ui";
 import { ServiceBase } from "./service-base";
 import { RESOLVER } from "@protoapp/adl/resolver";
 
-
 const api = API.makeApiRequests({});
 
 export class Service extends ServiceBase {
-  constructor(
-    http: HttpFetch,
-    baseUrl: string,
-  ) {
+  constructor(http: HttpFetch, baseUrl: string) {
     super(http, baseUrl, RESOLVER);
   }
 
@@ -20,4 +16,4 @@ export class Service extends ServiceBase {
   new_message = this.mkAuthReqFn(api.new_message);
   recent_messages = this.mkAuthReqFn(api.recent_messages);
   who_am_i = this.mkAuthReqFn(api.who_am_i);
-};
+}

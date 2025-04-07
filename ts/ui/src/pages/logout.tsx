@@ -1,14 +1,13 @@
-import Container from '@mui/material/Container';
-import Typography from '@mui/material/Typography';
-import Box from '@mui/material/Box';
-import { useAppState } from '@/hooks/use-app-state';
-import { useEffect } from 'react';
+import Container from "@mui/material/Container";
+import Typography from "@mui/material/Typography";
+import Box from "@mui/material/Box";
+import { useAppState } from "@/hooks/use-app-state";
+import { useEffect } from "react";
 
 export function Logout() {
+  const appState = useAppState();
 
-  const appState =useAppState();
-
-  useEffect( () => {
+  useEffect(() => {
     appState.logout();
   }, []);
 

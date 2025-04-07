@@ -1,11 +1,5 @@
-import {
-  DependencyList,
-  useEffect,
-  useState,
-  useCallback,
-  useRef,
-} from 'react';
-import { Loading, loading, ready } from '@/utils/loading-value';
+import { DependencyList, useEffect, useState, useCallback, useRef } from "react";
+import { Loading, loading, ready } from "@/utils/loading-value";
 
 /**
  * A hook that runs an async function to fetch a value.
@@ -19,10 +13,7 @@ export function useAsyncResult<T>(
   deps?: DependencyList
 ): [T, (t: T) => Promise<void>] {
   const asyncResultId = useRef(0);
-  const [_value, _setValue] = useState<[T, number]>(() => [
-    initial,
-    asyncResultId.current++,
-  ]);
+  const [_value, _setValue] = useState<[T, number]>(() => [initial, asyncResultId.current++]);
 
   function setValue(t: T, id: number) {
     // Only update if the result is not old.
@@ -52,11 +43,7 @@ export function useAsyncResult<T>(
  *
  * Returns the state, and a function to reload if required.
  */
-export function useAsyncResultPerodic<T>(
-  initial: T,
-  intervalMs: number,
-  fn: () => Promise<T>
-): [T] {
+export function useAsyncResultPerodic<T>(initial: T, intervalMs: number, fn: () => Promise<T>): [T] {
   const [value, setValue] = useState<T>(initial);
 
   const loadValue = useCallback(async () => {
@@ -74,10 +61,7 @@ export function useAsyncResultPerodic<T>(
   return [value];
 }
 
-export function useAsyncLoad<T>(
-  fn: () => Promise<T>,
-  deps?: DependencyList
-): [Loading<T>, () => Promise<void>] {
+export function useAsyncLoad<T>(fn: () => Promise<T>, deps?: DependencyList): [Loading<T>, () => Promise<void>] {
   const [value, refresh] = useAsyncResult(
     loading<T>(),
     async () => {
@@ -89,11 +73,7 @@ export function useAsyncLoad<T>(
   return [value, () => refresh(loading())];
 }
 
-export function useAsyncLoadPeriodic<T>(
-  intervalMs: number,
-  fn: () => Promise<T>,
-  deps?: DependencyList
-): [Loading<T>] {
+export function useAsyncLoadPeriodic<T>(intervalMs: number, fn: () => Promise<T>, deps?: DependencyList): [Loading<T>] {
   const [value, setValue] = useState<Loading<T>>(loading());
 
   async function loadValue() {

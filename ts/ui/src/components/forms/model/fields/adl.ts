@@ -1,8 +1,7 @@
-
 import { boolFieldFns, intFieldFns, jsonFieldFns, numberFieldFns, stringFieldFns } from "./primitive";
 import { FieldFns } from "./type";
 import * as systypes from "@protoapp/adl/sys/types";
-import * as adlrt  from "@adllang/adl-runtime";
+import * as adlrt from "@adllang/adl-runtime";
 import * as adlast from "@protoapp/adl/sys/adlast";
 import { createJsonBinding, jsonParseException } from "@adllang/adl-runtime";
 
@@ -30,18 +29,16 @@ export function adlPrimitiveFieldFns(primitive: string): FieldFns<unknown> | nul
   }
 }
 
-
 export function maybeField<T>(fieldFns: FieldFns<T>): FieldFns<systypes.Maybe<T>> {
   const newFieldFns: FieldFns<systypes.Maybe<T>> = {
-    toText: v => (v.kind === "just" ? fieldFns.toText(v.value) : ""),
-    validate: v => {
+    toText: (v) => (v.kind === "just" ? fieldFns.toText(v.value) : ""),
+    validate: (v) => {
       if (v === "") {
         return null;
       }
       return fieldFns.validate(v);
     },
-    fromText: text =>
-      text === "" ? { kind: "nothing" } : { kind: "just", value: fieldFns.fromText(text) },
+    fromText: (text) => (text === "" ? { kind: "nothing" } : { kind: "just", value: fieldFns.fromText(text) }),
     equals: (v1, v2) => {
       if (v1.kind === "nothing") {
         return v2.kind === "nothing";
@@ -57,18 +54,17 @@ export function maybeField<T>(fieldFns: FieldFns<T>): FieldFns<systypes.Maybe<T>
   return newFieldFns;
 }
 
-
 // Nullable combinator, that allows a field to be empty.
 export function nullableField<T>(fieldFns: FieldFns<T>): FieldFns<T | null> {
   const newFieldFns: FieldFns<T | null> = {
-    toText: v => (v === null ? "" : fieldFns.toText(v)),
-    validate: v => {
+    toText: (v) => (v === null ? "" : fieldFns.toText(v)),
+    validate: (v) => {
       if (v === "") {
         return null;
       }
       return fieldFns.validate(v);
     },
-    fromText: text => (text === "" ? null : fieldFns.fromText(text)),
+    fromText: (text) => (text === "" ? null : fieldFns.fromText(text)),
     equals: (v1, v2) => {
       if (v1 === null) {
         return v2 === null;
@@ -84,7 +80,7 @@ export function nullableField<T>(fieldFns: FieldFns<T>): FieldFns<T | null> {
 
 export function enumField(enumDecl: adlast.Decl, enumUnion: adlast.Union): FieldFns<string> {
   function isValid(v: string): boolean {
-    for(const f of enumUnion.fields) {
+    for (const f of enumUnion.fields) {
       if (v === f.name) {
         return true;
       }
@@ -114,17 +110,11 @@ export function enumField(enumDecl: adlast.Decl, enumUnion: adlast.Union): Field
   };
 }
 
-
-
 /**
  * Construct a field for the specified ADL type, editing the values
  * as json
  */
- export function createAdlField<T>(
-  typeExpr: adlrt.ATypeExpr<T>,
-  declResolver: adlrt.DeclResolver
-): FieldFns<T> {
-
+export function createAdlField<T>(typeExpr: adlrt.ATypeExpr<T>, declResolver: adlrt.DeclResolver): FieldFns<T> {
   const jb = createJsonBinding(declResolver, typeExpr);
 
   function toText(v: T) {
@@ -139,7 +129,7 @@ export function enumField(enumDecl: adlast.Decl, enumUnion: adlast.Union): Field
     return JSON.stringify(jb.toJson(v1)) === JSON.stringify(jb.toJson(v2));
   }
 
-  function validate(s: string) : string | null {
+  function validate(s: string): string | null {
     let jv = undefined;
     try {
       jv = JSON.parse(s);
@@ -155,9 +145,9 @@ export function enumField(enumDecl: adlast.Decl, enumUnion: adlast.Union): Field
   }
 
   return {
-    toText, 
+    toText,
     equals,
     validate,
-    fromText,
-  }
+    fromText
+  };
 }
