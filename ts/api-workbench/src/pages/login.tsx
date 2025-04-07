@@ -8,7 +8,6 @@ import { AsyncLoadingButton } from "@/components/Button";
 import { useAppState } from "@/hooks/use-app-state";
 import { useState } from "react";
 import { useNavigate } from "raviger";
-import { messagesUrl } from "@/navigation";
 
 export function Login() {
   const navigate = useNavigate();
@@ -23,7 +22,7 @@ export function Login() {
       const resp = await appState.api.login({ email: email.value(), password: password.value() });
       appState.setAuthStateFromLogin(resp);
       if (resp.kind === "tokens") {
-        navigate(messagesUrl());
+        navigate("/api-workbench");
       }
     } else {
       setShowErrors(true);

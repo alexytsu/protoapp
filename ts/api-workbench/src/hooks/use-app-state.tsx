@@ -5,7 +5,6 @@ import { ApiWithToken, Auth, JwtClaims, expiry_secs } from "../auth";
 import { jwtDecode } from "jwt-decode";
 
 import { LoginResp, makeRefreshReq } from "@protoapp/adl/protoapp/apis/ui";
-import { logoutUrl } from "@/navigation";
 import { useNavigate } from "raviger";
 
 const protoappApi = new Service(new FetchHttp(), "/api");

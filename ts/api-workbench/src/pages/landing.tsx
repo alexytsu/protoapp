@@ -1,5 +1,7 @@
 import { useAppState } from "@/hooks/use-app-state";
 import { Redirect } from "raviger";
+import { loginUrl } from "../navigation";
+import { workbenchUrl } from "../navigation";
 
 export function Landing() {
   const appState = useAppState();
@@ -10,8 +12,8 @@ export function Landing() {
     case "loading":
       return <div />;
     case "auth":
-      return <Redirect to="/messages" />;
+      return <Redirect to={workbenchUrl()} />;
     default:
-      return <Redirect to="/login" />;
+      return <Redirect to={loginUrl()} />;
   }
 }

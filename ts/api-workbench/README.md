@@ -1,39 +1,32 @@
-# Material UI - Vite.js in TypeScript example
+# API Workbench
 
-## How to use
+## Purpose
 
-Download the example [or clone the repo](https://github.com/mui/material-ui):
+The API Workbench provides a developer-focused interface for testing and debugging the Protoapp API endpoints. It allows:
 
-<!-- #default-branch-switch -->
+- Testing various API endpoints
+- Viewing request/response payloads
+- Authentication testing
+
+Deploying the API Workbench to production environments is NOT recommended. Operational workflows or administrative actions
+should be built into the React app in `ts/ui` or deployed as a standalone frontend application.
+
+## Development
 
 ```bash
-curl https://codeload.github.com/mui/material-ui/tar.gz/master | tar -xz --strip=2 material-ui-master/examples/material-ui-vite-ts
-cd material-ui-vite-ts
-```
-
-Install it and run:
-
-```bash
+cd ts/api-workbench
 npm install
 npm run dev
 ```
 
-or:
+The application will be available at http://localhost:5173
 
-<!-- #default-branch-switch -->
+## Usage
 
-[![Edit on StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/mui/material-ui/tree/master/examples/material-ui-vite-ts)
+After logging in, you'll be directed to the API Workbench interface where you can select and test various API endpoints.
 
-[![Edit on CodeSandbox](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/p/sandbox/github/mui/material-ui/tree/master/examples/material-ui-vite-ts)
+## Building for Production
 
-## The idea behind the example
-
-This example uses [Vite.js](https://github.com/vitejs/vite).
-It includes `@mui/material` and its peer dependencies, including [Emotion](https://emotion.sh/docs/introduction), the default style engine in Material UI v5.
-
-## What's next?
-
-<!-- #default-branch-switch -->
-
-You now have a working example project.
-You can head back to the documentation and continue by browsing the [templates](https://mui.com/material-ui/getting-started/templates/) section.
+```bash
+npm run build
+```
