@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "build": "tsc",
-    "check": "tsc --noEmit"
+    "check": "tsc --noEmit",
+    "postinstall": "tsc"
   },
   "dependencies": {
     "@adllang/adl-runtime": "npm:@jsr/adllang__adl-runtime@0.1.2"

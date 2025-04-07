@@ -27,32 +27,6 @@ async function main() {
       generateTransitive: true,
       excludeAstAnnotations: [],
     });
-
-    // ensure pnpm dependencies are installed
-    let cmd = new Deno.Command("pnpm", {
-      args: ["install"],
-      cwd: repo + "/ts",
-    });
-    const installOutput = await cmd.output();
-    if (installOutput.stderr.length > 0) {
-      console.error(
-        "pnpm install stderr:",
-        new TextDecoder().decode(installOutput.stderr),
-      );
-    }
-
-    // build the adl package so it can be consumed
-    cmd = new Deno.Command("pnpm", {
-      args: ["run", "build"],
-      cwd: repo + "/ts/adl",
-    });
-    const buildOutput = await cmd.output();
-    if (buildOutput.stderr.length > 0) {
-      console.error(
-        "pnpm build stderr:",
-        new TextDecoder().decode(buildOutput.stderr),
-      );
-    }
   }
 
   {

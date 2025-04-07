@@ -1,5 +1,5 @@
 {
-  "name": "api-workbench",
+  "name": "@protoapp/api-workbench",
   "private": true,
   "version": "0.0.1",
   "type": "module",

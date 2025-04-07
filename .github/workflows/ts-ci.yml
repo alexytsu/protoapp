@@ -20,6 +20,10 @@ jobs:
           echo "$PWD/.local/bin" >> $GITHUB_PATH
           deno --version
 
+      - name: Install deps
+        working-directory: ./ts
+        run: pnpm install
+
       - name: Check
         working-directory: ./ts
         run: pnpm run -r check

@@ -1,7 +1,7 @@
 {
     "lock": "./deno/deno.lock",
     "tasks" : {
-      "genadl" : "deno run --check=all --allow-all deno/genadl.ts",
+      "genadl" : "deno run --check=all --allow-all deno/genadl.ts && cd ts && pnpm install",
       "build-server-image": "cd rust/server && docker build --tag protoapp-server:latest .",
       "build-ui-image": "cd ts/ui && docker build --file Dockerfile --tag protoapp-ui:latest .."
     },
