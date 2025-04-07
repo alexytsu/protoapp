@@ -12,6 +12,8 @@ importers:
         specifier: ^5.6.3
         version: 5.6.3
 
+  prettier-config: {}
+
   ui:
     dependencies:
       '@adllang/adl-runtime':
@@ -35,6 +37,9 @@ importers:
       '@protoapp/adl':
         specifier: workspace:*
         version: link:../adl
+      '@protoapp/prettier-config':
+        specifier: workspace:*
+        version: link:../prettier-config
       base64-js:
         specifier: ^1.5.1
         version: 1.5.1

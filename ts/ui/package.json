@@ -10,6 +10,7 @@
     "check": "tsc --noEmit && prettier . --check",
     "format:write": "prettier . --write"
   },
+  "prettier": "@protoapp/prettier-config",
   "dependencies": {
     "@adllang/adl-runtime": "npm:@jsr/adllang__adl-runtime@0.1.2",
     "@emotion/react": "^11.13.3",
@@ -18,6 +19,7 @@
     "@mui/lab": "5.0.0-alpha.175",
     "@mui/material": "^6.1.3",
     "@protoapp/adl": "workspace:*",
+    "@protoapp/prettier-config": "workspace:*",
     "base64-js": "^1.5.1",
     "jwt-decode": "^4.0.0",
     "raviger": "^4.1.2",

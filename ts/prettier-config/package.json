@@ -1,0 +1,8 @@
+{
+  "name": "@protoapp/prettier-config",
+  "version": "1.0.0",
+  "description": "Common prettier config",
+  "main": "index.json",
+  "license": "CLOSED",
+  "private": true
+}
