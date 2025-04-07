@@ -31,7 +31,7 @@ export const ModalBackground = styled("div")({
   width: "100%" /* Full width */,
   height: "100%" /* Full height */,
   overflow: "auto" /* Enable scroll if needed */,
-  backgroundColor: "rgba(0,0,0,0.4)" /* Black w/ opacity */
+  backgroundColor: "rgba(0,0,0,0.4)" /* Black w/ opacity */,
 });
 
 export const ModalContent = styled("div")({
@@ -40,5 +40,5 @@ export const ModalContent = styled("div")({
   padding: "20px",
   border: "1px solid #888",
   borderRadius: "5px",
-  width: "80%" /* Could be more or less, depending on screen size */
+  width: "80%" /* Could be more or less, depending on screen size */,
 });

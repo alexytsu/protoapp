@@ -61,7 +61,7 @@ export function ApiWorkbench() {
       (ep) =>
         ep.security.kind === "public" ||
         (ep.security.kind === "token" && authState.kind == "auth") ||
-        (ep.security.kind === "tokenWithRole" && jwt_decoded && ep.security.value === jwt_decoded.role)
+        (ep.security.kind === "tokenWithRole" && jwt_decoded && ep.security.value === jwt_decoded.role),
     );
   }, [authState]);
 
@@ -140,8 +140,9 @@ export function ApiWorkbench() {
             display: "flex",
             flexDirection: "row",
             justifyContent: "space-between",
-            alignItems: "center"
-          }}>
+            alignItems: "center",
+          }}
+        >
           <Button disabled={!!currentRequest} onClick={() => setModal({ state: "choose-endpoint", endpoints })}>
             NEW REQUEST
           </Button>
@@ -183,7 +184,7 @@ function ModalCreateRequest<I, O>(props: {
   const state = useAdlFormState({
     veditor: props.endpoint.veditorI,
     jsonBinding: props.endpoint.jsonBindingI,
-    value0: props.initial
+    value0: props.initial,
   });
 
   const value = state.veditor.valueFromState(state.veditorState);
@@ -204,7 +205,8 @@ function ModalCreateRequest<I, O>(props: {
               props.execute(props.endpoint, value.value);
             }
           }}
-          disabled={!value.isValid}>
+          disabled={!value.isValid}
+        >
           EXECUTE
         </Button>
       </div>
@@ -256,8 +258,9 @@ function CompletedRequestView<I, O>(props: {
           display: "flex",
           flexDirection: "row",
           justifyContent: "space-between",
-          alignItems: "center"
-        }}>
+          alignItems: "center",
+        }}
+      >
         <b>{endpoint.name}</b>
         <Box>
           <IconButton size="small" onClick={() => props.reexecute(props.value)}>
@@ -278,21 +281,26 @@ function CompletedRequestView<I, O>(props: {
         </>
       )}
       <Box sx={{ margin: "10px" }}>
-        {resp.success ? (
+        {resp.success ?
           <MyJsonView data={jsonO} />
-        ) : (
-          <Box sx={{ color: "red" }}>
+        : <Box sx={{ color: "red" }}>
             <Box>Http Status: {resp.httpStatus}</Box>
             {resp.responseBody && <Box>Body: {resp.responseBody}</Box>}
           </Box>
-        )}
+        }
       </Box>
     </Card>
   );
 }
 
 function MyJsonView(props: { data: Json }) {
-  return <Box sx={{ fontSize: "0.8rem" }}>{props.data === null ? <div>null</div> : <JsonView src={props.data} />}</Box>;
+  return (
+    <Box sx={{ fontSize: "0.8rem" }}>
+      {props.data === null ?
+        <div>null</div>
+      : <JsonView src={props.data} />}
+    </Box>
+  );
 }
 
 async function executeRequest<I, O>(
@@ -300,7 +308,7 @@ async function executeRequest<I, O>(
   jwt: string | undefined,
   endpoint: HttpEndpoint<I, O>,
   req: I,
-  startedAt: Date
+  startedAt: Date,
 ): Promise<CompletedRequest<I, O>> {
   let resp: CompletedResponse<O>;
   try {
@@ -320,7 +328,7 @@ async function executeRequest<I, O>(
       queryString,
       reqbody,
       endpoint.jsonBindingO,
-      jwt
+      jwt,
     );
     resp = { success: true, value };
   } catch (e: unknown) {
@@ -338,7 +346,7 @@ async function executeRequest<I, O>(
     durationMs: new Date().getTime() - startedAt.getTime(),
     endpoint,
     req,
-    resp
+    resp,
   };
 }
 
@@ -414,7 +422,7 @@ function getHttpEndpoint<I, O>(resolver: ADL.DeclResolver, field: AST.Field): Ht
     veditorI,
     veditorO,
     jsonBindingI,
-    jsonBindingO
+    jsonBindingO,
   };
 }
 

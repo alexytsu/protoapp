@@ -14,7 +14,7 @@ export const stringFieldFns: FieldFns<string> = {
   },
   equals(v1, v2) {
     return v1 === v2;
-  }
+  },
 };
 
 export const STRING_FIELD: FieldFns<string> = stringFieldFns;
@@ -48,7 +48,7 @@ export function regexStringFieldFns(regex: string, description: string, returnGr
     },
     equals(v1, v2) {
       return v1 === v2;
-    }
+    },
   };
 }
 
@@ -86,7 +86,7 @@ export function intFieldFns(minValue: number | null, maxValue: number | null): F
     },
     equals(v1, v2) {
       return v1 === v2;
-    }
+    },
   };
 }
 
@@ -117,7 +117,7 @@ export function numberFieldFns(minValue: number | null, maxValue: number | null)
     },
     equals(v1, v2) {
       return v1 === v2;
-    }
+    },
   };
 }
 
@@ -151,7 +151,7 @@ export function boolFieldFns(): FieldFns<boolean> {
     },
     equals(v1, v2) {
       return v1 === v2;
-    }
+    },
   };
 }
 
@@ -177,7 +177,7 @@ export function jsonFieldFns(): FieldFns<unknown> {
     },
     equals(v1, v2) {
       return JSON.stringify(v1) === JSON.stringify(v2);
-    }
+    },
   };
 }
 
@@ -188,7 +188,7 @@ export const JSON_FIELD: FieldFns<unknown> = jsonFieldFns();
 export const EMAIL_FIELD: FieldFns<string> = regexStringFieldFns(
   "^\\s*((?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|\"(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])*\")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21-\\x5a\\x53-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])+)\\]))\\s*$",
   "an email address",
-  1
+  1,
 );
 
 interface Mapping<T> {
@@ -201,7 +201,7 @@ interface Mapping<T> {
 export function labelledValuesFieldFns<T>(
   typelabel: string,
   equals: (v1: T, v2: T) => boolean,
-  mappings: Mapping<T>[]
+  mappings: Mapping<T>[],
 ): FieldFns<T> {
   const labelmap: { [key: string]: T } = {};
   mappings.forEach((m) => {
@@ -234,6 +234,6 @@ export function labelledValuesFieldFns<T>(
     toText,
     validate,
     fromText,
-    equals
+    equals,
   };
 }

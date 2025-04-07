@@ -7,7 +7,7 @@ export class FetchHttp implements HttpFetch {
     const resp = await fetch(request.url, {
       method: request.method,
       headers: request.headers,
-      body: request.body
+      body: request.body,
     });
 
     return {
@@ -15,7 +15,7 @@ export class FetchHttp implements HttpFetch {
       statusText: resp.statusText,
       ok: resp.ok,
       json: () => resp.json(),
-      text: () => resp.text()
+      text: () => resp.text(),
     };
   }
 }

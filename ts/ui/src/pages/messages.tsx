@@ -14,7 +14,7 @@ export function Messages() {
 
   const [messages, reloadMessages] = useAsyncLoad(
     () => api.recent_messages(jwt, { page: { offset: 0, limit: 10 } }),
-    [api, jwt]
+    [api, jwt],
   );
   const message = useTypedFieldState(NON_EMPTY_MULTILINE_STRING_FIELD);
   const [showErrors, setShowErrors] = useState(false);
@@ -31,21 +31,21 @@ export function Messages() {
   }
 
   let renderedMessages =
-    messages.state == "loading"
-      ? []
-      : messages.value.items.map((m, i) => {
-          const posted_at = new Date(m.posted_at);
-          return (
-            <Card variant="outlined" sx={{ marginBottom: "10px" }} key={i}>
-              <CardContent>
-                <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-                  <b>{m.user_fullname}</b> ({posted_at.toLocaleDateString()} {posted_at.toLocaleTimeString()})
-                </Typography>
-                <Box sx={{ whiteSpace: "pre-wrap" }}>{m.message}</Box>
-              </CardContent>
-            </Card>
-          );
-        });
+    messages.state == "loading" ?
+      []
+    : messages.value.items.map((m, i) => {
+        const posted_at = new Date(m.posted_at);
+        return (
+          <Card variant="outlined" sx={{ marginBottom: "10px" }} key={i}>
+            <CardContent>
+              <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
+                <b>{m.user_fullname}</b> ({posted_at.toLocaleDateString()} {posted_at.toLocaleTimeString()})
+              </Typography>
+              <Box sx={{ whiteSpace: "pre-wrap" }}>{m.message}</Box>
+            </CardContent>
+          </Card>
+        );
+      });
   renderedMessages.reverse();
 
   return (

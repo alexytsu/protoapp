@@ -96,7 +96,7 @@ function multilineStringEditor(ctx: CustomContext): OVEditor<string, RenderFn> |
       stateFromValue: (s: string) => s,
       valueFromState: (s: string) => valid(s),
       update: (_s, e) => e,
-      render: render
+      render: render,
     };
   }
   return null;
@@ -132,11 +132,13 @@ function passwordEditor(ctx: CustomContext): OVEditor<string, RenderFn> | null {
                 endAdornment: (
                   <InputAdornment position="end">
                     <IconButton aria-label="toggle password visibility" onClick={() => setShowPassword((e) => !e)}>
-                      {showPassword ? <Visibility /> : <VisibilityOff />}
+                      {showPassword ?
+                        <Visibility />
+                      : <VisibilityOff />}
                     </IconButton>
                   </InputAdornment>
-                )
-              }
+                ),
+              },
             }}
           />
         );
@@ -151,7 +153,7 @@ function passwordEditor(ctx: CustomContext): OVEditor<string, RenderFn> | null {
         return e !== undefined ? invalid([e]) : valid(s);
       },
       update: (_s, e) => e,
-      render: render
+      render: render,
     };
   }
   return null;

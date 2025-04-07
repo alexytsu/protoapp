@@ -8,7 +8,7 @@ export class ServiceBase {
   constructor(
     private readonly http: HttpFetch,
     private readonly baseUrl: string,
-    private readonly resolver: ADL.DeclResolver
+    private readonly resolver: ADL.DeclResolver,
   ) {}
 
   mkReqFn<I, O>(rtype: HttpReq<I, O>): ReqFn<I, O> {
@@ -43,7 +43,7 @@ export class ServiceBase {
     queryString: string | undefined,
     jsonBody: Json | undefined,
     respJB: JsonBinding<O>,
-    authToken: string | undefined
+    authToken: string | undefined,
   ): Promise<O> {
     // Construct request
     const headers: { [key: string]: string } = {};
@@ -55,7 +55,7 @@ export class ServiceBase {
       url: this.baseUrl + path + (queryString === undefined ? "" : "?" + queryString),
       headers,
       method,
-      body: jsonBody === undefined ? undefined : JSON.stringify(jsonBody)
+      body: jsonBody === undefined ? undefined : JSON.stringify(jsonBody),
     };
 
     // Make request
@@ -76,7 +76,7 @@ export class AdlRequestError extends Error {
   constructor(
     readonly httpReq: HttpRequest,
     readonly respStatus: number,
-    readonly respBody: string
+    readonly respBody: string,
   ) {
     super(`Encountered server error attempting ${httpReq.method} request to ${httpReq.url} failed: ${respStatus}`);
   }
@@ -102,6 +102,6 @@ interface BiBinding<I, O> {
 function createBiBinding<I, O>(resolver: ADL.DeclResolver, rtype: BiTypeExpr<I, O>): BiBinding<I, O> {
   return {
     reqJB: createJsonBinding(resolver, rtype.reqType),
-    respJB: createJsonBinding(resolver, rtype.respType)
+    respJB: createJsonBinding(resolver, rtype.respType),
   };
 }

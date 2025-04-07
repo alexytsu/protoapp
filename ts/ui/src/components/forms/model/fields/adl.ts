@@ -18,7 +18,7 @@ const _primitiveFieldFns: Record<string, FieldFns<unknown>> = {
   Float: numberFieldFns(null, null),
   Double: numberFieldFns(null, null),
   Bool: boolFieldFns(),
-  Json: jsonFieldFns()
+  Json: jsonFieldFns(),
 };
 
 export function adlPrimitiveFieldFns(primitive: string): FieldFns<unknown> | null {
@@ -49,7 +49,7 @@ export function maybeField<T>(fieldFns: FieldFns<T>): FieldFns<systypes.Maybe<T>
           return fieldFns.equals(v1.value, v2.value);
         }
       }
-    }
+    },
   };
   return newFieldFns;
 }
@@ -73,7 +73,7 @@ export function nullableField<T>(fieldFns: FieldFns<T>): FieldFns<T | null> {
         return v1 === null;
       }
       return fieldFns.equals(v1, v2);
-    }
+    },
   };
   return newFieldFns;
 }
@@ -106,7 +106,7 @@ export function enumField(enumDecl: adlast.Decl, enumUnion: adlast.Union): Field
     },
     equals: (v1, v2) => {
       return v1 === v2;
-    }
+    },
   };
 }
 
@@ -148,6 +148,6 @@ export function createAdlField<T>(typeExpr: adlrt.ATypeExpr<T>, declResolver: ad
     toText,
     equals,
     validate,
-    fromText
+    fromText,
   };
 }

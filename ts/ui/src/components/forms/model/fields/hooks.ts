@@ -58,7 +58,7 @@ export function createTypedFieldState<T>(fieldFns: FieldFns<T>, fs: FieldState):
       fs.setText(s);
       fs.setInitialText(s);
     },
-    revert: () => fs.setText(fs.initialText)
+    revert: () => fs.setText(fs.initialText),
   };
 }
 
@@ -77,7 +77,7 @@ export class ImmutableFieldState implements FieldState {
     readonly text: string,
     readonly initialText: string,
     readonly id: string,
-    readonly updatefn: (newState: ImmutableFieldState) => void
+    readonly updatefn: (newState: ImmutableFieldState) => void,
   ) {}
 
   setText(s: string) {
@@ -91,7 +91,7 @@ export class ImmutableFieldState implements FieldState {
 
 export function createImmutableFieldState(
   initial: string,
-  updatefn: (newState: ImmutableFieldState) => void
+  updatefn: (newState: ImmutableFieldState) => void,
 ): ImmutableFieldState {
   return new ImmutableFieldState(initial, initial, uniqueId(), updatefn);
 }

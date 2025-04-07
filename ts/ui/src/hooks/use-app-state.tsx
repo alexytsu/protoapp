@@ -93,7 +93,7 @@ export function AppStateProvider(props: { children?: React.ReactNode }) {
     api: protoappApi,
     authState,
     setAuthStateFromLogin,
-    logout
+    logout,
   };
 
   return <AppStateContext.Provider value={apiManager}>{props.children}</AppStateContext.Provider>;
@@ -115,6 +115,6 @@ export function useApiWithToken(): ApiWithToken {
   return {
     api: appState.api,
     jwt: appState.authState.auth.jwt,
-    jwt_decoded: appState.authState.auth.jwt_decoded
+    jwt_decoded: appState.authState.auth.jwt_decoded,
   };
 }

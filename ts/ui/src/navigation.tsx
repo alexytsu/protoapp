@@ -14,7 +14,7 @@ export const ROUTES = {
       <Messages />
     </RequireLogin>
   ),
-  "/api-workbench": () => <ApiWorkbench />
+  "/api-workbench": () => <ApiWorkbench />,
 };
 
 export function landingUrl(): string {

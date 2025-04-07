@@ -81,7 +81,7 @@ export interface WithId<I, T> {
 export function getAdlTableInfo<T>(
   declResolver: DeclResolver,
   typeExpr: ATypeExpr<T>,
-  customFields?: CustomFieldFn
+  customFields?: CustomFieldFn,
 ): AdlTableInfo {
   const adlStruct = adltree.createAdlTree(typeExpr.value, declResolver).details();
 
@@ -91,7 +91,7 @@ export function getAdlTableInfo<T>(
 
   const scopedDecl = {
     moduleName: adlStruct.moduleName,
-    decl: adlStruct.astDecl
+    decl: adlStruct.astDecl,
   };
 
   const columns: AdlColumn<unknown>[] = [];
@@ -124,8 +124,8 @@ export function getAdlTableInfo<T>(
         column: {
           id: f.astField.name,
           header: cellContent(label),
-          content
-        }
+          content,
+        },
       });
     }
   });
@@ -143,7 +143,7 @@ export function getFieldFns(
   scopedDecl: ScopedDecl | null,
   field: adlast.Field | null,
   t: adltree.AdlTree,
-  customFields?: CustomFieldFn
+  customFields?: CustomFieldFn,
 ): FieldFns<unknown> | null {
   if (customFields) {
     const typeExpr = t.typeExpr;

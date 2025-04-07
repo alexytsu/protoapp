@@ -14,7 +14,8 @@ export function InternalLink(params: InternalLinkParams) {
       onClick={(e) => {
         e.preventDefault();
         navigate(params.url);
-      }}>
+      }}
+    >
       {params.children}
     </Link>
   );

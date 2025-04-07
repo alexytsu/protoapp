@@ -15,7 +15,7 @@ import {
   VectorEditorProps,
   CustomContext,
   VEditorCustomize,
-  FieldCustomize
+  FieldCustomize,
 } from "../model/veditor/adlfactory";
 import { FieldFns } from "../model/fields/type";
 import { typeExprToStringUnscoped } from "@adllang/adl-runtime";
@@ -37,7 +37,7 @@ export function fieldElement(element: JSX.Element): Rendered {
     },
     gridElement: () => {
       return { beside: element };
-    }
+    },
   };
 }
 
@@ -48,7 +48,7 @@ export function wideFieldElement(element: JSX.Element): Rendered {
     },
     gridElement: () => {
       return { below: [{ kind: "wide", element }] };
-    }
+    },
   };
 }
 
@@ -94,9 +94,9 @@ export class UiFactory implements Factory<RenderFn> {
         },
         gridElement: () => {
           return {
-            below: rows
+            below: rows,
           };
-        }
+        },
       };
     };
   }
@@ -120,9 +120,9 @@ export class UiFactory implements Factory<RenderFn> {
           const below = !ugrid ? [] : [...wideGridRow(ugrid.beside), ...(ugrid.below || [])];
           return {
             beside: select,
-            below
+            below,
           };
-        }
+        },
       };
     };
   }
@@ -145,9 +145,9 @@ export class UiFactory implements Factory<RenderFn> {
           const below = !props.isActive ? [] : [...wideGridRow(ugrid.beside), ...(ugrid.below || [])];
           return {
             beside: toggle,
-            below
+            below,
           };
-        }
+        },
       };
     };
   }
@@ -200,7 +200,7 @@ interface VectorItemFormProps<T> {
 function VectorItemForm(props: VectorItemFormProps<unknown>): JSX.Element {
   const formState = useAdlFormState({
     value0: props.value0,
-    veditor: props.veditor
+    veditor: props.veditor,
   });
 
   return <AdlForm state={formState} onApply={props.onApply} onCancel={props.onCancel} />;
@@ -232,7 +232,7 @@ function VectorVeditor<T>(props: VectorEditorProps<T, RenderFn>) {
       onApply: (t: T) => {
         props.splice(i + 1, 0, [t]);
         setModalState(undefined);
-      }
+      },
     });
   }
 
@@ -242,7 +242,7 @@ function VectorVeditor<T>(props: VectorEditorProps<T, RenderFn>) {
       onApply: (t: T) => {
         props.splice(i, 1, [t]);
         setModalState(undefined);
-      }
+      },
     });
   }
 
@@ -335,7 +335,7 @@ function renderStructRows(keyprefix: number[], rows: GridRow[]) {
         <StructGridWideValue key={keyString}>
           {indentElement}
           {row.element}
-        </StructGridWideValue>
+        </StructGridWideValue>,
       );
     } else if (row.kind === "labelled") {
       result.push(
@@ -345,7 +345,7 @@ function renderStructRows(keyprefix: number[], rows: GridRow[]) {
             {row.label}
           </StructGridLabel>
           {row.element.beside && <StructGridValue>{row.element.beside}</StructGridValue>}
-        </Fragment>
+        </Fragment>,
       );
       if (row.element.below) {
         result.push(...renderStructRows(key, row.element.below));
@@ -358,7 +358,7 @@ function renderStructRows(keyprefix: number[], rows: GridRow[]) {
 const StructGrid = styled("div")({
   display: "grid",
   gridTemplateColumns: "auto 1fr",
-  gridColumnGap: "20px"
+  gridColumnGap: "20px",
 });
 
 const StructGridLabel = styled("div")({
@@ -366,13 +366,13 @@ const StructGridLabel = styled("div")({
   flexDirection: "row",
   gridColumnStart: "1",
   gridColumnEnd: "1",
-  marginTop: "20px"
+  marginTop: "20px",
 });
 
 const StructGridValue = styled("div")({
   gridColumnStart: "2",
   gridColumnEnd: "2",
-  marginTop: "10px"
+  marginTop: "10px",
 });
 
 const StructGridWideValue = styled("div")({
@@ -380,11 +380,11 @@ const StructGridWideValue = styled("div")({
   flexDirection: "row",
   gridColumnStart: "1",
   gridColumnEnd: "3",
-  marginTop: "10px"
+  marginTop: "10px",
 });
 
 const RowControls = styled("div")({
   display: "flex",
   flexDirection: "row",
-  gap: "5px"
+  gap: "5px",
 });

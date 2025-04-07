@@ -1,6 +1,4 @@
 {
   "printWidth": 120,
-  "bracketSameLine": true,
-  "htmlWhitespaceSensitivity": "ignore",
-  "quoteProps": "consistent"
+  "experimentalTernaries": true
 }

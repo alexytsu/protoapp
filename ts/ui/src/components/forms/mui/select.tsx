@@ -28,7 +28,7 @@ export function useSelectState(initial: number, choices: string[]): SelectState 
     choices,
     active,
     onClick,
-    onChoice
+    onChoice,
   };
 }
 

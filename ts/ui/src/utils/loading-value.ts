@@ -55,7 +55,7 @@ export function lmap2<A1, A2, B>(ls: [Loading<A1>, Loading<A2>], f: (a1: A1, a2:
 
 export function lmap3<A1, A2, A3, B>(
   ls: [Loading<A1>, Loading<A2>, Loading<A3>],
-  f: (a1: A1, a2: A2, a3: A3) => B
+  f: (a1: A1, a2: A2, a3: A3) => B,
 ): Loading<B> {
   const [la1, la2, la3] = ls;
   if (la1.state === "loading" || la2.state === "loading" || la3.state === "loading") {
@@ -66,7 +66,7 @@ export function lmap3<A1, A2, A3, B>(
 
 export function lmap4<A1, A2, A3, A4, B>(
   ls: [Loading<A1>, Loading<A2>, Loading<A3>, Loading<A4>],
-  f: (a1: A1, a2: A2, a3: A3, a4: A4) => B
+  f: (a1: A1, a2: A2, a3: A3, a4: A4) => B,
 ): Loading<B> {
   const [la1, la2, la3, la4] = ls;
   if (la1.state === "loading" || la2.state === "loading" || la3.state === "loading" || la4.state === "loading") {
@@ -77,7 +77,7 @@ export function lmap4<A1, A2, A3, A4, B>(
 
 export function lmap5<A1, A2, A3, A4, A5, B>(
   ls: [Loading<A1>, Loading<A2>, Loading<A3>, Loading<A4>, Loading<A5>],
-  f: (a1: A1, a2: A2, a3: A3, a4: A4, a5: A5) => B
+  f: (a1: A1, a2: A2, a3: A3, a4: A4, a5: A5) => B,
 ): Loading<B> {
   const [la1, la2, la3, la4, la5] = ls;
   if (
@@ -94,7 +94,7 @@ export function lmap5<A1, A2, A3, A4, A5, B>(
 
 export function lmap6<A1, A2, A3, A4, A5, A6, B>(
   ls: [Loading<A1>, Loading<A2>, Loading<A3>, Loading<A4>, Loading<A5>, Loading<A6>],
-  f: (a1: A1, a2: A2, a3: A3, a4: A4, a5: A5, a6: A6) => B
+  f: (a1: A1, a2: A2, a3: A3, a4: A4, a5: A5, a6: A6) => B,
 ): Loading<B> {
   const [la1, la2, la3, la4, la5, la6] = ls;
   if (
@@ -112,7 +112,7 @@ export function lmap6<A1, A2, A3, A4, A5, A6, B>(
 
 export function lmap7<A1, A2, A3, A4, A5, A6, A7, B>(
   ls: [Loading<A1>, Loading<A2>, Loading<A3>, Loading<A4>, Loading<A5>, Loading<A6>, Loading<A7>],
-  f: (a1: A1, a2: A2, a3: A3, a4: A4, a5: A5, a6: A6, a7: A7) => B
+  f: (a1: A1, a2: A2, a3: A3, a4: A4, a5: A5, a6: A6, a7: A7) => B,
 ): Loading<B> {
   const [la1, la2, la3, la4, la5, la6, la7] = ls;
   if (

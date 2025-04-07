@@ -37,7 +37,7 @@ export interface AdlFormState<T> {
 
 export enum Mode {
   VE, // Edit with the generated ADL VEditor
-  RAW // Edit with a (validated) json multiline text field
+  RAW, // Edit with a (validated) json multiline text field
 }
 
 interface AwaitingValidation {
@@ -115,7 +115,7 @@ export function useAdlFormState<T>(params: {
     mode,
     setMode,
     formValidation,
-    setFormValidation
+    setFormValidation,
   };
 }
 
@@ -184,7 +184,7 @@ export const AdlForm = (props: AdlFormProps<unknown>) => {
       const validationSeq = state.formValidation.validationSeq + 1;
       state.setFormValidation({
         type: "awaiting",
-        validationSeq
+        validationSeq,
       });
       console.log("awaiting validation of ", vv.value);
       const error: string | undefined = await props.validate(vv.value);
@@ -193,12 +193,12 @@ export const AdlForm = (props: AdlFormProps<unknown>) => {
         state.setFormValidation({
           type: "error",
           error,
-          validationSeq
+          validationSeq,
         });
       } else {
         state.setFormValidation({
           type: "ok",
-          validationSeq
+          validationSeq,
         });
       }
     }
@@ -265,7 +265,8 @@ export const AdlForm = (props: AdlFormProps<unknown>) => {
         <Button
           variant="contained"
           disabled={errors.length > 0 || state.formValidation.type !== "ok"}
-          onClick={onApply}>
+          onClick={onApply}
+        >
           Apply
         </Button>
       );
@@ -338,13 +339,13 @@ function FormVEditor(props: {
 }
 
 const ErrLabel = styled("label")({
-  color: "red"
+  color: "red",
 });
 
 const ActionBar = styled("div")({
   display: "flex",
   flexDirection: "row",
-  justifyContent: "space-between"
+  justifyContent: "space-between",
 });
 
 const ActionGroup = styled("div")({
@@ -353,7 +354,7 @@ const ActionGroup = styled("div")({
   justifyContent: "space-between",
   alignItems: "center",
   gap: "10px",
-  marginLeft: "20px"
+  marginLeft: "20px",
 });
 
 const RawJsonEditor = (props: { disabled?: boolean; value: string; onChange: (s: string) => void }) => {
@@ -365,6 +366,7 @@ const RawJsonEditor = (props: { disabled?: boolean; value: string; onChange: (s:
       maxRows={10}
       disabled={props.disabled}
       value={props.value}
-      onChange={(ev) => props.onChange(ev.target.value)}></TextField>
+      onChange={(ev) => props.onChange(ev.target.value)}
+    ></TextField>
   );
 };

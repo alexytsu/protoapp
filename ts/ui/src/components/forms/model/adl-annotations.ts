@@ -10,12 +10,12 @@ type Json = {} | null;
 
 export function getAnnotation<T>(
   anns: systypes.MapEntry<adlast.ScopedName, Json>[],
-  jsonBinding: JsonBinding<T>
+  jsonBinding: JsonBinding<T>,
 ): T | null {
   for (const ann of anns) {
     const te: adlast.TypeExpr = {
       typeRef: { kind: "reference", value: ann.key },
-      parameters: []
+      parameters: [],
     };
     if (typeExprsEqual(te, jsonBinding.typeExpr)) {
       return jsonBinding.fromJson(ann.value);
@@ -36,7 +36,7 @@ export function getFormLabelFromAnnotation(dresolver: DeclResolver, field: adlas
 
 export function getFormGroupsFromAnnotation(
   dresolver: DeclResolver,
-  annotations: adlast.Annotations
+  annotations: adlast.Annotations,
 ): ui.FormGroups | null {
   const jb = createJsonBinding(dresolver, ui.texprFormGroups());
   return getAnnotation(annotations, jb);
@@ -44,7 +44,7 @@ export function getFormGroupsFromAnnotation(
 
 export function getValidRegexAnnotation(
   dresolver: DeclResolver,
-  annotations: adlast.Annotations
+  annotations: adlast.Annotations,
 ): ui.ValidRegex | null {
   const jb = createJsonBinding(dresolver, ui.texprValidRegex());
   return getAnnotation(annotations, jb);
@@ -52,7 +52,7 @@ export function getValidRegexAnnotation(
 
 export function getValidValuesAnnotation(
   dresolver: DeclResolver,
-  annotations: adlast.Annotations
+  annotations: adlast.Annotations,
 ): ui.ValidValues | null {
   const jb = createJsonBinding(dresolver, ui.texprValidValues());
   return getAnnotation(annotations, jb);
