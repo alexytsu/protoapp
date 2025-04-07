@@ -7,7 +7,7 @@ on:
       - "deno/**"
 
 jobs:
-  lint-and-format:
+  lint-and-check:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
