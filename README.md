@@ -179,5 +179,15 @@ pnpm run dev
 )
 ```
 
+## 3.6 Start the api workbench in dev mode
+```bash
+(
+cd ts/api-workbench
+# note pnpm is installed by local-setup.sh
+pnpm install
+pnpm run dev
+)
+
+
 The (minimal) web application will be accessible at: http://localhost:5173
-The api workbench will be accessible at: http://localhost:5173/api-workbench
+The api workbench will be accessible at: http://localhost:5174
