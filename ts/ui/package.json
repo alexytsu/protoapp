@@ -14,6 +14,7 @@
   },
   "prettier": "@protoapp/prettier-config",
   "dependencies": {
+    "@adllang/adl-runtime": "npm:@jsr/adllang__adl-runtime@0.1.2",
     "@protoapp/adl": "workspace:*",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"

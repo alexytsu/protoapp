@@ -93,6 +93,9 @@ importers:
 
   ui:
     dependencies:
+      '@adllang/adl-runtime':
+        specifier: npm:@jsr/adllang__adl-runtime@0.1.2
+        version: '@jsr/adllang__adl-runtime@0.1.2'
       '@protoapp/adl':
         specifier: workspace:*
         version: link:../adl
