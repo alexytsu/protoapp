@@ -1,20 +1,22 @@
 import { FC, useState } from "react";
-import { LoadingButton, LoadingButtonProps } from "@mui/lab";
+import { Button, ButtonProps } from "@mui/material";
 
-interface AsyncLoadingButtonProps extends LoadingButtonProps {
+interface AsyncLoadingButtonProps extends ButtonProps {
   onClick?: () => Promise<void>;
 }
 
-// Shows a spinner whilst the onClick handler is running, disabled if an
-// onClick handler is not provided
+/**
+ * Shows a spinner whilst the onClick handler is running, disabled if an
+ * onClick handler is not provided
+ */
 export const AsyncLoadingButton: FC<AsyncLoadingButtonProps> = (props) => {
-  const [showLoading, setShowLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
   async function onAsyncClick() {
     if (props.onClick) {
-      setShowLoading(true);
+      setLoading(true);
       await props.onClick();
-      setShowLoading(false);
+      setLoading(false);
     }
   }
-  return <LoadingButton {...props} disabled={!props.onClick} loading={!!showLoading} onClick={onAsyncClick} />;
+  return <Button {...props} disabled={!props.onClick} loading={loading} onClick={onAsyncClick} />;
 };
