@@ -14,12 +14,13 @@ should be built into the React app in `ts/ui` or deployed as a standalone fronte
 ## Development
 
 ```bash
-cd ts/api-workbench
-npm install
-npm run dev
+cd ts
+pnpm install
+cd api-workbench
+pnpm run dev
 ```
 
-The application will be available at http://localhost:5173
+The application will be available at http://localhost:5174
 
 ## Usage
 

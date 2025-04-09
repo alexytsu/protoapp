@@ -5,9 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "check": "tsc --noEmit && prettier . --check",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "check": "tsc --noEmit && prettier . --check",
     "format:write": "prettier . --write"
   },
   "prettier": "@protoapp/prettier-config",
@@ -30,9 +30,9 @@
     "@protoapp/prettier-config": "workspace:*",
     "@types/react": "^18.3.11",
     "@types/react-dom": "^18.3.1",
-    "@vitejs/plugin-react": "^4.3.4",
-    "prettier": "^3.5.3",
-    "typescript": "^5.6.3",
-    "vite": "^5.4.8"
+    "@vitejs/plugin-react": "catalog:",
+    "prettier": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:"
   }
 }
