@@ -1,5 +1,7 @@
 import * as adl from "@adllang/adl-runtime";
 import * as adlast from "@adllang/adlc-tools/adlgen/sys/adlast";
+import mustache from "mustache_ts";
+import { snakeCase } from "@mesqueeb/case-anything";
 
 import {
   createJsonBinding,
@@ -8,7 +10,6 @@ import {
   scopedName,
 } from "@adllang/adl-runtime";
 import { AdlSourceParams } from "@adllang/adlc-tools/utils/sources";
-
 import {
   decodeTypeExpr,
   expandNewType,
@@ -20,8 +21,7 @@ import {
   parseAdlModules,
 } from "@adllang/adlc-tools/utils/adl";
 
-import { snakeCase } from "@mesqueeb/case-anything";
-import mustache from "mustache_ts";
+import { FileWriter } from "./file-writer.ts";
 
 export interface GenSqlParams extends AdlSourceParams {
   extensions?: string[];
@@ -154,7 +154,9 @@ async function generateCreateSqlSchema(
   );
   writer.write(
     `-- Schema auto-generated from adl modules: ${
-      Array.from(moduleNames.keys()).join(", ")
+      Array.from(
+        moduleNames.keys(),
+      ).join(", ")
     }\n`,
   );
   writer.write(`--\n`);
@@ -175,9 +177,9 @@ async function generateCreateSqlSchema(
   for (const t of dbTables) {
     const ann: JsonObject = t.ann as JsonObject;
     const indexes = (ann["indexes"] || []) as string[][];
-    const uniquenessConstraints =
-      (ann["uniqueness_constraints"] || []) as string[][];
-    const extraSql = ann["extra_sql"] as string[] || [];
+    const uniquenessConstraints = (ann["uniqueness_constraints"] ||
+      []) as string[][];
+    const extraSql = (ann["extra_sql"] as string[]) || [];
 
     const lines: { code: string; comment?: string }[] = [];
     for (const f of t.fields) {
@@ -199,7 +201,9 @@ async function generateCreateSqlSchema(
           `alter table ${
             quoteReservedName(t.name)
           } add constraint ${t.name}_${columnName}_fk foreign key (${columnName}) references ${
-            quoteReservedName(columnType.fkey.table)
+            quoteReservedName(
+              columnType.fkey.table,
+            )
           }(${columnType.fkey.column});`,
         );
       }
@@ -217,17 +221,18 @@ async function generateCreateSqlSchema(
     for (let i = 0; i < indexes.length; i++) {
       const cols = indexes[i].map(findColName);
       constraints.push(
-        `create index ${t.name}_${i + 1}_idx on ${quoteReservedName(t.name)}(${
-          cols.join(", ")
-        });`,
+        `create index ${t.name}_${i + 1}_idx on ${
+          quoteReservedName(
+            t.name,
+          )
+        }(${cols.join(", ")});`,
       );
     }
     for (let i = 0; i < uniquenessConstraints.length; i++) {
       const cols = uniquenessConstraints[i].map(findColName);
       constraints.push(
         `alter table ${quoteReservedName(t.name)} add constraint ${t.name}_${
-          i +
-          1
+          i + 1
         }_con unique (${cols.join(", ")});`,
       );
     }
@@ -271,25 +276,6 @@ async function generateCreateSqlSchema(
   }
 
   await writer.close();
-}
-
-export class FileWriter {
-  content: string[] = [];
-
-  constructor(readonly path: string, readonly verbose: boolean) {
-    if (verbose) {
-      console.log(`Writing ${path}...`);
-    }
-    this.content = [];
-  }
-
-  write(s: string) {
-    this.content.push(s);
-  }
-
-  close(): Promise<void> {
-    return Deno.writeTextFile(this.path, this.content.join(""));
-  }
 }
 
 /**
@@ -343,10 +329,7 @@ function getDbFields(
     if (scopedDecl.decl.type_.kind == "struct_") {
       let result: DbField[] = [];
       for (const f of scopedDecl.decl.type_.value.fields) {
-        result = [
-          ...result,
-          ..._fromField(f, typeBindings),
-        ];
+        result = [...result, ..._fromField(f, typeBindings)];
       }
       return result;
     }
@@ -374,13 +357,15 @@ function getDbFields(
       return _fromTypeExpr(typeExpr);
     }
 
-    return [{
-      name: field.name,
-      serializedName: field.serializedName,
-      typeExpr,
-      default: field.default,
-      annotations: field.annotations,
-    }];
+    return [
+      {
+        name: field.name,
+        serializedName: field.serializedName,
+        typeExpr,
+        default: field.default,
+        annotations: field.annotations,
+      },
+    ];
   }
 
   return _fromDecl(scopedDecl, []);
@@ -392,19 +377,14 @@ type DbField = adlast.Field; // For now
  *  Returns the primary key for the table
  */
 function getPrimaryKey(fields: DbField[]): string[] {
-  const primaryKey = fields.filter(
-    (f) => getAnnotation(f.annotations, DB_PRIMARY_KEY) !== undefined,
-  ).map(
-    (f) => getColumnName(f),
-  );
+  const primaryKey = fields
+    .filter((f) => getAnnotation(f.annotations, DB_PRIMARY_KEY) !== undefined)
+    .map((f) => getColumnName(f));
 
   return primaryKey;
 }
 
-function assumeField<T>(
-  obj: Json | undefined,
-  key: string,
-): T | undefined {
+function assumeField<T>(obj: Json | undefined, key: string): T | undefined {
   if (obj == undefined) {
     return undefined;
   }
@@ -464,8 +444,8 @@ function getColumnType(
   const dtype = decodeTypeExpr(typeExpr);
   if (
     dtype.kind == "Nullable" ||
-    dtype.kind == "Reference" &&
-      adl.scopedNamesEqual(dtype.refScopedName, MAYBE)
+    (dtype.kind == "Reference" &&
+      adl.scopedNamesEqual(dtype.refScopedName, MAYBE))
   ) {
     return {
       sqltype: annctype ||
@@ -477,7 +457,7 @@ function getColumnType(
 
   // For all other types, the column will not allow nulls
   return {
-    sqltype: (annctype || getColumnType1(resolver, typeExpr, dbProfile)),
+    sqltype: annctype || getColumnType1(resolver, typeExpr, dbProfile),
     fkey: getForeignKeyRef(resolver, dbTables, typeExpr),
     notNullable: true,
   };
@@ -499,7 +479,8 @@ function getColumnType1(
       }
 
       if (
-        sdecl.decl.type_.kind == "union_" && adl.isEnum(sdecl.decl.type_.value)
+        sdecl.decl.type_.kind == "union_" &&
+        adl.isEnum(sdecl.decl.type_.value)
       ) {
         return dbProfile.enumColumnType;
       }
@@ -691,8 +672,8 @@ export async function generateMetadata(
   const writer = new FileWriter(outmetadata, !!params.verbose);
 
   // Exclude metadata for the metadata tables
-  const dbTables = dbResources.tables.filter((dbt) =>
-    dbt.name != "meta_table" && dbt.name !== "meta_adl_decl"
+  const dbTables = dbResources.tables.filter(
+    (dbt) => dbt.name != "meta_table" && dbt.name !== "meta_adl_decl",
   );
 
   writer.write("delete from meta_table;\n");
@@ -701,9 +682,13 @@ export async function generateMetadata(
     const description = typeof docAnn === "string" ? docAnn : "";
     writer.write(
       `insert into meta_table(name,description,decl_module_name, decl_name) values (${
-        dbstr(dbTable.name)
+        dbstr(
+          dbTable.name,
+        )
       },${dbstr(description)},${dbstr(dbTable.scopedDecl.moduleName)},${
-        dbstr(dbTable.scopedDecl.decl.name)
+        dbstr(
+          dbTable.scopedDecl.decl.name,
+        )
       });\n`,
     );
   }
@@ -712,9 +697,13 @@ export async function generateMetadata(
     const description = typeof docAnn === "string" ? docAnn : "";
     writer.write(
       `insert into meta_table(name,description,decl_module_name, decl_name) values (${
-        dbstr(dbView.name)
+        dbstr(
+          dbView.name,
+        )
       },${dbstr(description)},${dbstr(dbView.scopedDecl.moduleName)},${
-        dbstr(dbView.scopedDecl.decl.name)
+        dbstr(
+          dbView.scopedDecl.decl.name,
+        )
       });\n`,
     );
   }
@@ -722,14 +711,10 @@ export async function generateMetadata(
   writer.write("\n");
 
   writer.write("delete from meta_adl_decl;\n");
-  insertDecls(
-    loadedAdl.resolver,
-    writer,
-    [
-      ...dbTables.map((dbt) => dbt.scopedDecl),
-      ...dbResources.views.map((dbv) => dbv.scopedDecl),
-    ],
-  );
+  insertDecls(loadedAdl.resolver, writer, [
+    ...dbTables.map((dbt) => dbt.scopedDecl),
+    ...dbResources.views.map((dbv) => dbv.scopedDecl),
+  ]);
   await writer.close();
 }
 
@@ -771,7 +756,9 @@ function insertDecls(
       const jsdecl = JSON.stringify(jbDecl.toJson(sdecl.decl));
       writer.write(
         `insert into meta_adl_decl(module_name,name,decl) values (${
-          dbstr(sdecl.moduleName)
+          dbstr(
+            sdecl.moduleName,
+          )
         },${dbstr(sdecl.decl.name)}, ${dbstr(jsdecl)});\n`,
       );
       done[name] = true;
@@ -848,8 +835,8 @@ function substituteTypeBindings(
   texpr: adlast.TypeExpr,
   bindings: TypeBinding[],
 ): adlast.TypeExpr {
-  const parameters = texpr.parameters.map(
-    (te) => substituteTypeBindings(te, bindings),
+  const parameters = texpr.parameters.map((te) =>
+    substituteTypeBindings(te, bindings)
   );
 
   if (texpr.typeRef.kind == "typeParam") {

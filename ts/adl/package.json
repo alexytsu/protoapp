@@ -1,7 +1,8 @@
 {
   "name": "@protoapp/adl",
+  "description": "Auto-generated TypeScript package containing ADL code",
   "private": true,
-  "version": "0.0.1",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "build": "tsc",
@@ -17,8 +18,15 @@
   "exports": {
     ".": "./dist/index.js",
     "./resolver": "./dist/resolver.js",
-    "./common/*": "./dist/common/*.js",
-    "./protoapp/*": "./dist/protoapp/*.js",
-    "./sys/*": "./dist/sys/*.js"
+    "./common/db": "./dist/common/db.js",
+    "./common/http": "./dist/common/http.js",
+    "./common/strings": "./dist/common/strings.js",
+    "./common/time": "./dist/common/time.js",
+    "./common/ui": "./dist/common/ui.js",
+    "./protoapp/apis/ui": "./dist/protoapp/apis/ui.js",
+    "./protoapp/db": "./dist/protoapp/db.js",
+    "./sys/adlast": "./dist/sys/adlast.js",
+    "./sys/annotations": "./dist/sys/annotations.js",
+    "./sys/types": "./dist/sys/types.js"
   }
 }

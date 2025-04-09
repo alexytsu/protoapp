@@ -11,7 +11,8 @@ import {
 import * as adlast from "@adllang/adlc-tools/adlgen/sys/adlast";
 import { pascalCase, snakeCase } from "@mesqueeb/case-anything";
 
-import { FileWriter, loadDbResources } from "./gen-sqlschema.ts";
+import { loadDbResources } from "./gen-sqlschema.ts";
+import { FileWriter } from "./file-writer.ts";
 
 export interface GenRustSeaQuerySchemaParams extends AdlSourceParams {
   outputFile: string;

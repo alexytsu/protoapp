@@ -1,6 +1,7 @@
 import * as path from "@std/path";
 import { genRust, genTypescript } from "@adllang/adlc-tools";
 
+import { genAdlTsPackage } from "./gen-adl-ts-package.ts";
 import { genCreateSqlSchema } from "./gen-sqlschema.ts";
 import { genRustSeaQuerySchema } from "./gen-rs-seaquery-schema.ts";
 
@@ -16,16 +17,26 @@ async function main() {
     //----------------------------------------------------------------------
     // Generate typescript for the adl package
 
-    const outputDir = repo + "/ts/adl/src";
+    const packageRoot = repo + "/ts/adl";
     await genTypescript({
       ...commonFlags,
       adlModules: ["protoapp.apis.ui", "sys.adlast", "common.ui"],
       tsStyle: "tsc",
-      outputDir: outputDir,
+      outputDir: packageRoot + "/src",
       includeResolver: true,
-      manifest: outputDir + "/.adl-manifest",
+      manifest: packageRoot + "/src/.adl-manifest",
       generateTransitive: true,
       excludeAstAnnotations: [],
+    });
+
+    await genAdlTsPackage({
+      ...commonFlags,
+      adlModules: ["protoapp.apis.ui", "sys.adlast", "common.ui"],
+      packageName: "@protoapp/adl",
+      packageRoot: repo + "/ts/adl",
+      buildOutputDir: "/dist",
+      typescriptVersion: "^5.6.3",
+      adlRuntimeVersion: "0.1.2",
     });
   }
 
