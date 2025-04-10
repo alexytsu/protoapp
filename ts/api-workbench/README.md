@@ -8,9 +8,6 @@ The API Workbench provides a developer-focused interface for testing and debuggi
 - Viewing request/response payloads
 - Authentication testing
 
-Deploying the API Workbench to production environments is NOT recommended. Operational workflows or administrative actions
-should be built into the React app in `ts/ui` or deployed as a standalone frontend application.
-
 ## Development
 
 ```bash

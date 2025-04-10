@@ -22,8 +22,6 @@ const App: React.FC = () => {
   const [messages, setMessages] = useState<API.Message[]>([]); // ADL defined API.Message
   const [newMessage, setNewMessage] = useState<string>("");
 
-  const isLoggedIn = accessToken !== null;
-
   const handleLogoutImmediate = useCallback(() => {
     setAccessToken(null);
     setMessages([]);
@@ -41,32 +39,32 @@ const App: React.FC = () => {
   );
 
   const fetchUserInfo = useCallback(async () => {
-    if (!isLoggedIn || !accessToken) return;
+    if (!accessToken) return;
     try {
       await service.whoAmI(accessToken, null);
     } catch (err) {
       handleApiError(err);
     }
-  }, [isLoggedIn, accessToken, handleApiError]);
+  }, [accessToken, handleApiError]);
 
   const fetchMessages = useCallback(async () => {
-    if (!isLoggedIn || !accessToken) return;
+    if (!accessToken) return;
     try {
       const messageData = await service.recentMessages(accessToken, { page: { offset: 0, limit: 50 } });
       setMessages(messageData.items);
     } catch (err) {
       handleApiError(err);
     }
-  }, [isLoggedIn, accessToken, handleApiError]);
+  }, [accessToken, handleApiError]);
 
   useEffect(() => {
-    if (isLoggedIn) {
+    if (accessToken) {
       fetchUserInfo();
       fetchMessages();
     } else {
       setMessages([]);
     }
-  }, [fetchMessages, fetchUserInfo, isLoggedIn]);
+  }, [accessToken, fetchMessages, fetchUserInfo]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -110,7 +108,7 @@ const App: React.FC = () => {
     <div>
       <h1>ProtoApp</h1>
 
-      {!isLoggedIn ?
+      {accessToken === null ?
         <form onSubmit={handleLogin}>
           <h2>Login</h2>
           <div>
