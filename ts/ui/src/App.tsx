@@ -1,39 +1,62 @@
-import { Service } from "./service";
-import { AdlRequestError } from "./service/service-base";
-import { FetchHttp } from "./service/fetch-http";
-
 import * as API from "@protoapp/adl/protoapp/apis/ui";
 import React, { useState, useEffect, useCallback } from "react";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+
+import { AdlRequestError } from "@/service/service-base";
+import { Service } from "@/service";
+import { FetchHttp } from "@/service/fetch-http";
+import { ThemeProvider } from "@/components/theme-provider";
+import { ModeToggle } from "@/components/mode-toggle";
+import { LoginScreen } from "@/screens/LoginScreen";
+import { MessagesScreen } from "@/screens/MessagesScreen";
 
 const service = new Service(new FetchHttp(), "/api");
 
-// NOTE: This is a toy implementation of a client-side app that demonstrates the
-// use of a `Service` to make typesafe RPC requests from the ADL generated API-definition.
+// Wrapper component for protected routes
+const ProtectedRoute: React.FC<{ accessToken: string | null; children: React.ReactNode }> = ({
+  accessToken,
+  children,
+}) => {
+  if (!accessToken) {
+    // User not logged in, redirect to login page
+    return <Navigate to="/login" replace />;
+  }
+  // User is logged in, render the requested component
+  return <>{children}</>;
+};
 
 const App: React.FC = () => {
-  // Login form state
-  const [email, setEmail] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
-
   // Auth state
-  const [accessToken, setAccessToken] = useState<string | null>(null);
+  const [accessToken, setAccessToken] = useState<string | null>(() => {
+    // Optionally load token from storage on initial load
+    return localStorage.getItem("protoapp_access_token");
+  });
 
   // Messages state
   const [messages, setMessages] = useState<API.Message[]>([]); // ADL defined API.Message
-  const [newMessage, setNewMessage] = useState<string>("");
+
+  // Persist token to local storage
+  useEffect(() => {
+    if (accessToken) {
+      localStorage.setItem("protoapp_access_token", accessToken);
+    } else {
+      localStorage.removeItem("protoapp_access_token");
+    }
+  }, [accessToken]);
 
   const handleLogoutImmediate = useCallback(() => {
     setAccessToken(null);
     setMessages([]);
+    // No need to clear email/password/newMessage here
   }, []);
 
   const handleApiError = useCallback(
     (err: unknown) => {
-      console.error(`API call failed`);
+      console.error(`API call failed`, err);
       if (err instanceof AdlRequestError && err.respStatus === 401 && accessToken) {
-        console.log("Received 401, logging out.");
-        handleLogoutImmediate();
+        handleLogoutImmediate(); // Force logout on 401
       }
+      // Potentially add user feedback here (e.g., toast notification)
     },
     [accessToken, handleLogoutImmediate],
   );
@@ -59,101 +82,95 @@ const App: React.FC = () => {
 
   useEffect(() => {
     if (accessToken) {
-      fetchUserInfo();
-      fetchMessages();
+      fetchUserInfo(); // Validate token / get user info
+      fetchMessages(); // Fetch initial messages
     } else {
-      setMessages([]);
+      setMessages([]); // Clear messages on logout
     }
   }, [accessToken, fetchMessages, fetchUserInfo]);
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleLogin = async (email: string, password: string) => {
     try {
       const response = await service.login({ email, password });
       if (response.kind === "tokens") {
         setAccessToken(response.value.access_jwt);
-        setEmail("");
-        setPassword("");
+        // No need to clear email/password state here, LoginScreen handles its own state
       } else if (response.kind === "invalid_credentials") {
-        console.warn("Invalid login credentials");
+        // Add user feedback for invalid credentials
+        alert("Invalid email or password.");
       }
     } catch (err) {
       handleApiError(err);
+      alert("An error occurred during login. Please try again.");
     }
   };
 
   const handleLogout = useCallback(async () => {
+    if (!accessToken) return; // Should not happen if called from MessagesScreen, but good practice
     try {
       await service.logout({});
     } catch (err) {
       handleApiError(err);
+      // Still log out client-side even if API fails
     } finally {
       handleLogoutImmediate();
     }
-  }, [handleApiError, handleLogoutImmediate]);
+  }, [accessToken, handleApiError, handleLogoutImmediate]);
 
-  const handlePostMessage = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newMessage.trim() || !accessToken) return;
+  const handlePostMessage = async (message: string) => {
+    if (!message.trim() || !accessToken) return;
     try {
-      await service.newMessage(accessToken, { message: newMessage });
-      setNewMessage("");
-      await fetchMessages();
+      await service.newMessage(accessToken, { message: message });
+      // No need to clear newMessage state here, MessagesScreen handles its own state
+      await fetchMessages(); // Refresh messages after posting
     } catch (err) {
       handleApiError(err);
+      alert("Failed to post message. Please try again.");
     }
   };
 
   return (
-    <div>
-      <h1>Protoapp</h1>
+    <ThemeProvider defaultTheme="system" storageKey="protoapp-theme">
+      <Router>
+        <div className="container mx-auto flex flex-col min-h-screen gap-8 p-4">
+          <header className="flex items-center justify-between">
+            <h1 className="text-4xl font-bold">Protoapp</h1>
+            <ModeToggle />
+          </header>
 
-      {accessToken === null ?
-        <form onSubmit={handleLogin}>
-          <h2>Login</h2>
-          <div>
-            <label>Email: </label>
-            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-          </div>
-          <div>
-            <label>Password: </label>
-            <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
-          </div>
-          <button type="submit">Login</button>
-        </form>
-      : <div>
-          <button onClick={handleLogout}>Logout</button>
+          <main className="flex-grow">
+            <Routes>
+              <Route path="/login" element={<LoginScreen accessToken={accessToken} onLogin={handleLogin} />} />
 
-          <div>
-            <h3>Messages</h3>
-            <button onClick={fetchMessages}>Refresh Messages</button>
-            <ul>
-              {messages.length === 0 && <li>No messages yet.</li>}
-              {messages.map((msg) => (
-                <li key={msg.id}>
-                  <strong>{msg.user_fullname || "Unknown User"}</strong> ({new Date(msg.posted_at).toLocaleString()}):
-                  <p>{msg.message}</p>
-                </li>
-              ))}
-            </ul>
-          </div>
+              <Route
+                path="/messages"
+                element={
+                  <ProtectedRoute accessToken={accessToken}>
+                    <MessagesScreen
+                      messages={messages}
+                      onPostMessage={handlePostMessage}
+                      onRefreshMessages={fetchMessages}
+                      onLogout={handleLogout}
+                    />
+                  </ProtectedRoute>
+                }
+              />
 
-          <h3>Post a New Message</h3>
-          <form onSubmit={handlePostMessage}>
-            <textarea
-              value={newMessage}
-              onChange={(e) => setNewMessage(e.target.value)}
-              rows={5}
-              placeholder="Enter your message..."
-              required
-            />
-            <button type="submit" disabled={!newMessage.trim()}>
-              Post Message
-            </button>
-          </form>
+              <Route
+                path="/"
+                element={accessToken ? <Navigate to="/messages" replace /> : <Navigate to="/login" replace />}
+              />
+
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </main>
+
+          <footer className="mt-auto text-center text-sm text-muted-foreground py-4 border-t">
+            Protoapp © {new Date().getFullYear()}
+          </footer>
         </div>
-      }
-    </div>
+      </Router>
+    </ThemeProvider>
   );
 };
 
