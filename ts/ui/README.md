@@ -4,27 +4,21 @@ This template provides a minimal setup to get React working in Vite with HMR and
 
 ## Libraries
 
-The Protoapp UI does not specify any particular philosophy or libraries for building your applications. It provides a minimal technical demonstration of ADLs typesafe RPC capabilities by implementing a simple message board system.
-
-Notably, Protoapp UI does not choose solutions for:
-
-- Themeing and component libraries
-- State management
-- Data fetching and caching
-- Client-side routing
-
-The `src/service` implementation of data fetching is lightweight and can be easily replaced with a fetching library of your choice. It is recommended to generate an API service from the `ApiRequests` struct in the protoapp.apis.ui module by writing a custom code generator in the Deno directory.
+- Protoapp UI uses [shadcn](https://ui.shadcn.com/docs) to build its component library
 
 ## Development
 
+The following commands are run in the `ts/ui` subdirectory which appropriate paths set by `. deno/local-setup.sh`.
+
 ```bash
-cd ts
-pnpm install
-cd ui
+# Starting the Vite dev server (will be available at http://localhost:5173)
 pnpm run dev
 ```
 
-The application will be available at http://localhost:5173
+```bash
+# Adding a new component from shadcn
+pnpm dlx shadcn@latest add button
+```
 
 ## Building for Production
 

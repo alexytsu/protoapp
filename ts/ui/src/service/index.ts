@@ -1,8 +1,8 @@
-import { HttpFetch } from "./http";
-import { ServiceBase } from "./service-base";
-
 import * as API from "@protoapp/adl/protoapp/apis/ui";
 import { RESOLVER } from "@protoapp/adl/resolver";
+
+import { HttpFetch } from "./http";
+import { ServiceBase } from "./service-base";
 
 const api = API.makeApiRequests({});
 

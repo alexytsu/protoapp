@@ -1,8 +1,8 @@
-import { HttpFetch, HttpRequest } from "./http";
-
 import * as ADL from "@adllang/adl-runtime";
 import { HttpReq } from "@protoapp/adl/common/http";
 import { createJsonBinding, Json, JsonBinding } from "@adllang/adl-runtime";
+
+import { HttpFetch, HttpRequest } from "./http";
 
 export class ServiceBase {
   constructor(
