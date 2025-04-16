@@ -1,100 +1,82 @@
-This respository implements a small full stack web application, using [ADL] as the "typing glue". It's intended to
-demonstrate the benefits of the strong cross language type system provided by ADL, and also to serve as a template
-that can be forked as a starting point for new projects.
+# Protoapp - Batteries Included
 
-The application is a trivial messaging system, where authenticated users can post messages to a shared noticeboard.
+This repository is an opinionated fork of [adl-lang/protoapp] that is suitable
+for building modern full-stack web applications. It uses [ADL] as the "typing
+glue", enabling strong cross-language type-safety from the database to the user
+interface.
+
+[adl-lang/protoapp]: https://github.com/adl-lang/protoapp
 
 The technology stack consists of:
 
 - [postgresql] for the relational store
-- [rust]+[poem]+[sqlx] for the application server
-- [typescript]+[react] for the web user interface
+- [rust] + [poem] + [sqlx] for the application server
+- [typescript] + [react] for the web user interface
 
-[ADL]:https://github.com/adl-lang/adl
-[postgresql]:https://www.postgresql.org/
-[rust]:https://www.rust-lang.org/
-[poem]:https://github.com/poem-web/poem
-[sqlx]:https://github.com/launchbadge/sqlx
-[typescript]:https://www.typescriptlang.org/
-[react]:https://react.dev/
+[ADL]: https://github.com/adl-lang/adl
+[postgresql]: https://www.postgresql.org
+[rust]: https://www.rust-lang.org
+[poem]: https://github.com/poem-web/poem
+[sqlx]: https://github.com/launchbadge/sqlx
+[typescript]: https://www.typescriptlang.org
+[react]: https://react.dev
 
-# 1 Why ADL
+More information on ADL, the [API Workbench](./ts/api-workbench/README.md) and
+the underlying tech stack can be found in the upstream
+[README](https://github.com/adl-lang/protoapp/blob/master/README.md).
 
-[ADL] is a framework for building cross language data models. In this repo we use ADL to define
+## ADL
 
-* the relational [database schema](./adl/protoapp/db.adl)
-* the client/server [http based API](./adl/protoapp/apis/ui.adl)
-* the server [config file format](./adl/protoapp/config/server.adl)
+[ADL] is a framework for building cross language data models. In this repo we
+use ADL to define
+
+- the relational [database schema](./adl/protoapp/db.adl)
+- the client/server [http based API](./adl/protoapp/apis/ui.adl)
+- the server [config file format](./adl/protoapp/config/server.adl)
 
 From these, we generate:
 
-* the [postgres SQL](./sql/adl-gen/adl-tables.latest.sql) for the db schema
-* the rust [db schema binding](./rust/server/src/adl/db/schema.rs)
-* the rust [api binding](./rust/server/src/adl/gen/protoapp/apis/ui.rs) (used [here](,/rust/server/src/server/routing.rs))
-* the typescript [api binding](./ts/ui/src/adl-gen/protoapp/apis/ui.ts) (used [here](./ts/ui/src/service/index.ts))
+- the [postgres SQL](./sql/adl-gen/adl-tables.latest.sql) for the db schema
+- the rust [db schema binding](./rust/adl/src/db/schema.rs)
+- the rust [api binding](./rust/adl/src/gen/protoapp/apis/ui.rs) (used
+  [here](./rust/server/src/server/routing.rs))
+- the typescript [api binding](./ts/adl/src/protoapp/apis/ui.ts) (used
+  [here](./ts/ui/src/service/index.ts))
 
-Having strong types end to end in the system provides many benefits. Some of these are described below.
+## Opinionated defaults
 
-## 1.1 A strongly typed DB model
+After forking or cloning this template, you are free to change any part of the
+tooling and software architecture as you see fit.
 
-The ADL data model is more expressive than SQL - hence we benefit from having ADL as the db schema source of truth. For
-example if we wish to store a complex structured value in a db field we can define it's type in ADL whilst persisting
-it as a postgresql `jsonb` value. The rust db binding will automatically map between the db json value and the ADL generated
-rust type whenever reading/writing the field.
+The most opinionated part of the codebase is the `ts/ui` frontend project, which
+implements a simple messaging app. Adding a new frontend of any project is as
+easy as adding a new pnpm package and including `@protoapp/adl` as a workspace
+dependency.
 
-Additionally, in our ADL db model, we distinguished between db keys of different types. eg db keys for the user
-table ([AppUserId](./adl/protoapp/db.adl#L18)), vs db keys for the message
-table([MessageId](./adl/protoapp/db.adl#L32)). For these we generate distinct key types
-in the rust server code, eliminating at compile time the possibility of mixing up key types.
+The current UI was generated with
+[Vite](https://vite.dev/guide/#scaffolding-your-first-vite-project) and uses the
+`react-ts` template. Additional patterns for testing, routing and components are
+established for reference.
 
+For example, the template uses:
 
-## 1.2 Declarative API security
+- [shadcn/ui] for visual components
+- [tailwindcss] for styling
+- [storybook] for testing and iterating on the interface
 
-Each ADL defined API endpoint declares its security policy, which is a value of type
-[HttpSecurity](./adl/common/http.adl#L35). In the rust server implementation this is implemented
-for all endpoints (existing and future) at a [single point](./rust/server/src/server/poem_adl_interop.rs#L181)
+[shadcn/ui]: https://ui.shadcn.com/docs
+[tailwindcss]: https://tailwindcss.com/docs/styling-with-utility-classes
+[storybook]: https://storybook.js.org/docs/get-started/why-storybook
 
-## 1.3 Generated Forms
+## Local setup
 
-The typescript code has runtime type information about all ADL types. This means that it's possible to automatically
-generate a UI form for any ADL type, no matter how complex it's algebraic structure. Furthermore, the ADL file
-[common/strings.adl](./adl/common/strings.adl) defines specific types of strings, and any generated forms reflects the
-use of these. For example:
+Currently Linux and macOS are supported.
 
-* Type `StringNE` produces a string field that must not be empty
-* Type `EmailAddress` produces a string field that must be a valid email
-* Type `Password` produces a hidden string field (with a show button)
-* Type `StringML` produces a multi line string editor
+Install [docker] and [rust/cargo] for your platform. Then install deno, node,
+pnpm, and adl into a repo local directory by sourcing the local setup script:
 
-Also the generated forms validate the different db types, described above: 
-
-![workbench 4](docs/workbench-4.png)
-
-## 1.4 API Workbench UI
-
-The system includes an "API workbench" which is a stand alone UI automatically derived from the ADL definition. This
-UI provides generated forms to execute all api endpoints, and capture their responses. As soon an an endpoint is added or modified
-this UI is updated accordingly.
-
-The API Workbench references the ADL endpoint security policies (see above) to ensure that only the endpoints accessible to the
-current user are shown.
-
-1) The api workbench in use:
-![workbench 1](docs/workbench-1.png)
-
-2) Choosing an endpoint:
-![workbench 2](docs/workbench-2.png)
-
-3) Constructing an endpoint request:
-![workbench 3](docs/workbench-3.png)
-
-
-# 2 Local setup
-
-Currently linux and macos are supported.
-
-Install docker and rust/cargo for your platform. Then install deno, node, pnpm, and adl into a repo
-local directory by sourcing the local setup script:
+[docker]: https://www.docker.com
+[rust/cargo]: https://rustup.rs
 
 ```bash
 . deno/local-setup.sh
@@ -105,10 +87,10 @@ Check installed tool versions with:
 ```
 deno --version
 node --version
-adlc show --version 
+adlc show --version
 ```
 
-# 3 Local development
+## Development loop
 
 When you've changed any ADL, regenerate rust/typescript/sql code with
 
@@ -116,14 +98,13 @@ When you've changed any ADL, regenerate rust/typescript/sql code with
 deno task genadl
 ```
 
-## 3.1 Start postgres
-
+### Starting postgres
 
 ```bash
 (cd platform/dev; docker compose up -d db)
 ```
 
-## 3.2 Run the unit tests
+### Running server tests
 
 ```bash
 (
@@ -133,7 +114,7 @@ cargo test -- --test-threads=1
 )
 ```
 
-## 3.3 Start the server
+### Starting the server
 
 ```bash
 (
@@ -157,7 +138,7 @@ cargo run --bin protoapp-server
 
 This will create the db schema and/or apply any necessary migrations
 
-## 3.4 Create some test users
+### Creating test users
 
 ```bash
 (
@@ -168,7 +149,7 @@ cargo run --bin protoapp-tools -- create-user --is-admin sarah@test.com Sarah ab
 )
 ```
 
-## 3.5 Start the ui in dev mode
+### Starting the UI in dev mode
 
 ```bash
 (
@@ -179,7 +160,8 @@ pnpm run dev
 )
 ```
 
-## 3.6 Start the api workbench in dev mode
+### Starting the API Workbench in dev mode
+
 ```bash
 (
 cd ts/api-workbench
@@ -187,12 +169,12 @@ cd ts/api-workbench
 pnpm install
 pnpm run dev
 )
+```
 
+The web application will be accessible at: http://localhost:5173 The api
+workbench will be accessible at: http://localhost:5174
 
-The (minimal) web application will be accessible at: http://localhost:5173
-The api workbench will be accessible at: http://localhost:5174
-
-## 4 Forking
+## Forking
 
 The following linux commands can be used to rename "protoapp" to "myproject" in a fork
 of this repo:
