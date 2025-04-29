@@ -1,0 +1,17 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "(OSX) Launch Server",
+      "type": "lldb",
+      "request": "launch",
+      "program": "${workspaceFolder}/rust/target/debug/protoapp-server",
+      "cwd": "${workspaceFolder}/rust/server",
+      "args": ["--config", "${workspaceFolder}/rust/server/env.local.json"],
+      "env": {
+        "RUST_LOG": "debug"
+      },
+      "preLaunchTask": "rust: build workspace"
+    }
+  ]
+}
