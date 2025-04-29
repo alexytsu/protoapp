@@ -62,7 +62,7 @@ impl DbConversions for serde_json::Value {
 }
 
 impl DbConversions for u32 {
-    type DbType = i64;
+    type DbType = i32;
 
     fn to_db(&self) -> Self::DbType {
         *self as Self::DbType
