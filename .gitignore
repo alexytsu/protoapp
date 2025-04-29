@@ -1,3 +1,5 @@
 .local/
+
 .vscode/.zshcompdump
 .vscode/.zshcompdump.zwc
+.idea/
