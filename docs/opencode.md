@@ -6,6 +6,8 @@
 
 Copy the following to a either `$HOME/.opencode.json` or `$XDG_CONFIG_HOME/opencode/.opencode.json`. An Anthropic API Key (for Claude) is available in Bitwarden.
 
+You will need to install `typescript-language-server` according to the docs.
+
 ```json
 {
   "data": {
@@ -46,6 +48,11 @@ Copy the following to a either `$HOME/.opencode.json` or `$XDG_CONFIG_HOME/openc
   "mcpServers": {
   },
   "lsp": {
+      "typescript": {
+          "disabled": false,
+          "command": "typescript-language-server",
+          "args": ["--stdio"]
+      }
   },
   "debug": false,
   "debugLSP": false
@@ -68,4 +75,5 @@ A useful workflow is to make manual ADL changes, run `deno task genadl` and then
 
 ## TODO
 
-- [ ] Add configuration for LSPs
+- [ ] Add configuration for rust LSP
+- [ ] Use local-setup to install rust-analyzer and typescript-language-server

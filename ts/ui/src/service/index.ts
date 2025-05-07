@@ -13,6 +13,7 @@ export class Service extends ServiceBase {
 
   // public api
   login = this.mkReqFn(api.login);
+  signup = this.mkReqFn(api.signup);
   refresh = this.mkReqFn(api.refresh);
   logout = this.mkReqFn(api.logout);
 

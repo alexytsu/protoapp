@@ -38,6 +38,7 @@
   component. The PageView should have all state passed in via props and should
   have a corresponding storybook. State (apart from simple UI state) and API
   requests etc. should be handled at the Page.tsx level.
+- An ADL union where each variant is `Void` does not get generated as a tagged discriminated union. Instead, it is generated as an enum.
 
 ### Rust
 
@@ -46,6 +47,12 @@
 - Use thiserror for error handling
 - Use descriptive variable/function names in snake_case
 - Prefer Result/Option for error handling
+
+### ADL RPC
+
+- Our RPC pattern takes inspiration from gRPC
+- All requests should return HTTP 200 (except for limited cases in authorization etc.)
+- Requests that fail, return a discriminated union indicating their status
 
 ## Build/Test/Lint Commands
 
