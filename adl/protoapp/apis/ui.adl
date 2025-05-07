@@ -28,6 +28,12 @@ struct ApiRequests {
     "security" : "public"
   };
 
+  /// Signup a user
+  HttpReq<SignupReq, SignupResp> signup = {
+    "path": "/signup",
+    "security" : "public"
+  };
+
   /// Get a refreshed access token
   ///
   /// If the refresh token is not provided in the request body, then it will
@@ -92,6 +98,17 @@ struct LoginReq {
 union LoginResp {
   LoginTokens tokens;
   Void invalid_credentials;
+};
+
+struct SignupReq {
+  StringNE email;
+  StringNE fullname;
+  Password password;
+};
+
+union SignupResp {
+  Void success;
+  Void email_already_exists;
 };
 
 struct RefreshReq {
