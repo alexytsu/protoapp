@@ -6,7 +6,8 @@ use adl::custom::common::db::DbKey;
 use adl::gen::common::http::Unit;
 use adl::gen::protoapp::apis::ui::{
     ApiRequests, LoginReq, LoginResp, LoginTokens, Message, Paginated, QueryUsersReq,
-    RecentMessagesReq, RefreshReq, RefreshResp, User, UserDetails, UserWithId, WithId,
+    RecentMessagesReq, RefreshReq, RefreshResp, SignupReq, SignupResp, User, UserDetails,
+    UserWithId, WithId,
 };
 use adl::gen::protoapp::config::server::ServerConfig;
 use adl::gen::protoapp::db::{AppUser, AppUserId};
@@ -23,6 +24,28 @@ type ReqContext = AdlReqContext<AppState>;
 
 pub async fn healthy(_ctx: ReqContext, _i: ()) -> HandlerResult<()> {
     Ok(())
+}
+
+pub async fn signup(ctx: ReqContext, i: SignupReq) -> HandlerResult<SignupResp> {
+    // Check if user with this email already exists
+    let existing_user = db::get_user_with_email(&ctx.state.db_pool, &i.email).await?;
+    if existing_user.is_some() {
+        return Ok(SignupResp::EmailAlreadyExists);
+    }
+
+    // Create the new user
+    let hashed_password = hash_password(&i.password).expect("password can be hashed");
+    let user = AppUser {
+        fullname: i.fullname.clone(),
+        email: i.email.clone(),
+        is_admin: false, // New users are not admins by default
+        hashed_password,
+    };
+
+    // Save the user to the database
+    db::create_user(&ctx.state.db_pool, &user).await?;
+
+    Ok(SignupResp::Success)
 }
 
 pub async fn login(ctx: ReqContext, i: LoginReq) -> HandlerResult<LoginResp> {

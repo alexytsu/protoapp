@@ -1,7 +1,7 @@
 use adl::gen::common::http::Unit;
 use adl::gen::protoapp::apis;
 use adl::gen::protoapp::apis::ui::{
-    LoginReq, LoginTokens, Message, PageReq, Paginated, RefreshReq,
+    LoginReq, LoginTokens, Message, PageReq, Paginated, RefreshReq, SignupReq,
 };
 
 use crate::server::tests::helpers::{
@@ -15,6 +15,48 @@ mod helpers;
 #[tokio::test]
 async fn schema_setup() {
     let mut db = DbTestEnv::new().await;
+    db.cleanup().await;
+}
+
+#[tokio::test]
+async fn server_signup() {
+    let mut db = DbTestEnv::new().await;
+    let oserver = OServer::spawn(AppState::new(test_server_config(), db.pool.clone()));
+
+    // Test successful signup
+    {
+        let signup_req = SignupReq {
+            email: "newuser@test.com".to_owned(),
+            fullname: "New User".to_owned(),
+            password: "password123".to_owned(),
+        };
+
+        let resp = server_public_req(apis::ui::ApiRequests::def_signup(), &signup_req).await;
+        assert!(is_signup_success(&resp));
+
+        // Verify we can login with the new credentials
+        let login_req = LoginReq {
+            email: "newuser@test.com".to_owned(),
+            password: "password123".to_owned(),
+        };
+
+        let login_resp = server_public_req(apis::ui::ApiRequests::def_login(), &login_req).await;
+        assert!(is_valid_login(&login_resp));
+    }
+
+    // Test signup with existing email
+    {
+        let signup_req = SignupReq {
+            email: "newuser@test.com".to_owned(), // Same email as before
+            fullname: "Another User".to_owned(),
+            password: "different123".to_owned(),
+        };
+
+        let resp = server_public_req(apis::ui::ApiRequests::def_signup(), &signup_req).await;
+        assert!(!is_signup_success(&resp));
+    }
+
+    oserver.shutdown().await.unwrap();
     db.cleanup().await;
 }
 
@@ -241,6 +283,10 @@ fn is_valid_login(resp: &apis::ui::LoginResp) -> bool {
 
 fn is_valid_refresh(resp: &apis::ui::RefreshResp) -> bool {
     matches!(resp, apis::ui::RefreshResp::AccessToken(_))
+}
+
+fn is_signup_success(resp: &apis::ui::SignupResp) -> bool {
+    matches!(resp, apis::ui::SignupResp::Success)
 }
 
 fn get_login_tokens(resp: apis::ui::LoginResp) -> Option<LoginTokens> {
