@@ -4,6 +4,8 @@ import { AdlcError, genRust, genTypescript } from "@adllang/adlc-tools";
 import { genAdlTsPackage } from "./gen-adl-ts-package.ts";
 import { genCreateSqlSchema } from "./gen-sqlschema.ts";
 import { genRustSeaQuerySchema } from "./gen-rs-seaquery-schema.ts";
+import { genKyselyInterface } from "./gen-kysely-interface.ts";
+import { genServerEndpointInterface } from "./gen-server-endpoint-interface.ts";
 
 async function main() {
   const repo = getRepoRoot();
@@ -64,6 +66,27 @@ async function main() {
 
   {
     //----------------------------------------------------------------------
+    // Generate typescript for the server
+    const outputDir = repo + "/ts/server/src/adl-gen";
+    await genKyselyInterface({
+      ...commonFlags,
+      adlModules: ["protoapp.db"],
+      outputFile: outputDir + "/database.ts",
+    });
+
+    await genServerEndpointInterface({
+      ...commonFlags,
+      adlModules: ["protoapp.apis.ui", "protoapp.db"],
+      outputFile: outputDir + "/endpoints.ts",
+      apiModule: "protoapp.apis.ui",
+      apiName: "ApiRequests",
+      adlGenDirRel: "@protoapp/adl",
+      verbose: true,
+    });
+  }
+
+  {
+    //----------------------------------------------------------------------
     // Generate a db schema
 
     await genCreateSqlSchema({
@@ -79,11 +102,11 @@ async function main() {
     // written by hand
     Deno.copyFile(
       repo + "/sql/adl-gen/adl-tables.latest.sql",
-      repo + "/rust/server/migrations/00000000000020_adl-tables.latest.sql",
+      repo + "/rust/server/migrations/00000000000020_adl-tables.latest.sql"
     );
     Deno.copyFile(
       repo + "/sql/adl-gen/adl-views.latest.sql",
-      repo + "/rust/server/migrations/00000000000030_adl-views.latest.sql",
+      repo + "/rust/server/migrations/00000000000030_adl-views.latest.sql"
     );
   }
 }
