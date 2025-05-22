@@ -35,7 +35,7 @@ export function addCode(
   codeGen: CodeGen,
   typeExpr: TypeExpr,
   name: string,
-  comment: string | null
+  comment: string | null,
 ) {
   if (typeExpr.typeRef.kind !== "reference") {
     throw new Error("Unexpected - typeExpr.typeRef.kind !== reference");
@@ -57,18 +57,22 @@ export function addCode(
           codeGen.add(`/** ${comment} */`);
         }
         codeGen.add(
-          `private ${camelCase(
-            "post " + name
-          )}: PostFn<${importingHelper.asReferencedName(
-            requestType
-          )}, ${importingHelper.asReferencedName(responseType)}>;`
+          `private ${
+            camelCase(
+              "post " + name,
+            )
+          }: PostFn<${
+            importingHelper.asReferencedName(
+              requestType,
+            )
+          }, ${importingHelper.asReferencedName(responseType)}>;`,
         );
         codeGen.add("");
         return;
       }
       case "ctor": {
         codeGen.add(
-          `this.${camelCase("post " + name)} = this.mkPostFn(api.${name});`
+          `this.${camelCase("post " + name)} = this.mkPostFn(api.${name});`,
         );
         return;
       }
@@ -79,9 +83,11 @@ export function addCode(
         }
 
         codeGen.add(
-          `async ${name}(req: ${importingHelper.asReferencedName(
-            requestType
-          )}): Promise<${importingHelper.asReferencedName(responseType)}> {`
+          `async ${name}(req: ${
+            importingHelper.asReferencedName(
+              requestType,
+            )
+          }): Promise<${importingHelper.asReferencedName(responseType)}> {`,
         );
         codeGen.add(`  return this.${camelCase("post " + name)}.call(req);`);
         codeGen.add(`}`);
@@ -89,10 +95,9 @@ export function addCode(
       }
     }
   }
-  const adlType =
-    loadedAdl.allAdlDecls[
-      `${typeExpr.typeRef.value.moduleName}.${typeExpr.typeRef.value.name}`
-    ];
+  const adlType = loadedAdl.allAdlDecls[
+    `${typeExpr.typeRef.value.moduleName}.${typeExpr.typeRef.value.name}`
+  ];
   if (adlType) {
     if (adlType.decl.type_.kind === "type_") {
       throw new Error("BUG: type aliases should already have been expanded");
@@ -103,7 +108,7 @@ export function addCode(
   }
   if (codeGenType === "collect") {
     console.warn(
-      `typescript-services: unrecognized field ${typeExpr.typeRef.value.name}`
+      `typescript-services: unrecognized field ${typeExpr.typeRef.value.name}`,
     );
   }
 }
@@ -122,7 +127,7 @@ export interface GenTypescriptServiceParams extends AdlSourceParams {
  */
 export function expandTypeAliases(
   loadedAdl: LoadedAdl,
-  typeExpr: TypeExpr
+  typeExpr: TypeExpr,
 ): TypeExpr {
   const typeRef = typeExpr.typeRef;
   const parameters = typeExpr.parameters;
@@ -135,7 +140,7 @@ export function expandTypeAliases(
       }
       return expandTypeAliases(
         loadedAdl,
-        substituteTypeParams(m, decl.decl.type_.value.typeExpr)
+        substituteTypeParams(m, decl.decl.type_.value.typeExpr),
       );
     }
   }
@@ -147,7 +152,7 @@ export function expandTypeAliases(
 
 function substituteTypeParams(
   m: Record<string, TypeExpr>,
-  typeExpr: TypeExpr
+  typeExpr: TypeExpr,
 ): TypeExpr {
   const typeRef = typeExpr.typeRef;
   if (typeRef.kind == "typeParam") {
@@ -167,7 +172,7 @@ function substituteTypeParams(
 
 export async function resolveImports(
   params: GenTypescriptServiceParams,
-  code: CodeGen
+  code: CodeGen,
 ) {
   const { apiName, apiModule } = params;
 
@@ -226,7 +231,7 @@ export async function resolveImports(
       code,
       apiEntry.typeExpr,
       apiEntry.name,
-      getComment(apiEntry)
+      getComment(apiEntry),
     );
   }
 
@@ -267,10 +272,12 @@ export async function genTypescriptService(params: GenTypescriptServiceParams) {
   // typescript: import {foo as bar} from "blah"
   importingHelper.modulesImports.forEach(
     (imports_: Set<string>, module: string) => {
-      const importedModuleFrom = `${adlGenDirRel}/${module.replace(
-        /\./g,
-        "/"
-      )}`;
+      const importedModuleFrom = `${adlGenDirRel}/${
+        module.replace(
+          /\./g,
+          "/",
+        )
+      }`;
 
       const modImports: string[] = [];
       for (const imp_ of Array.from(imports_)) {
@@ -278,14 +285,14 @@ export async function genTypescriptService(params: GenTypescriptServiceParams) {
       }
 
       code.add(
-        `import { ${modImports.join(", ")} } from "${importedModuleFrom}";`
+        `import { ${modImports.join(", ")} } from "${importedModuleFrom}";`,
       );
-    }
+    },
   );
 
   // hardcoded common imports
   code.add(
-    `import { AuthTokens, HttpServiceBase } from "./http-service-base";`
+    `import { AuthTokens, HttpServiceBase } from "./http-service-base";`,
   );
   code.add(`import { HttpServiceError } from "./http-service-error";`);
   code.add(`import { GetFn, PostFn } from "./types";`);
@@ -314,7 +321,7 @@ export async function genTypescriptService(params: GenTypescriptServiceParams) {
       classBody,
       apiEntry.typeExpr,
       apiEntry.name,
-      getComment(apiEntry)
+      getComment(apiEntry),
     );
   }
 
@@ -331,7 +338,7 @@ export async function genTypescriptService(params: GenTypescriptServiceParams) {
     .add("/** fn to get an auth token */")
     .add("getAuthToken: ()=>AuthTokens,")
     .add(
-      "/** Error handler to allow for cross cutting concerns, e.g. authorization errors */"
+      "/** Error handler to allow for cross cutting concerns, e.g. authorization errors */",
     )
     .add("handleError: (error: HttpServiceError) => void");
 
@@ -341,7 +348,7 @@ export async function genTypescriptService(params: GenTypescriptServiceParams) {
 
   ctorBody.add("super(http, baseUrl, resolver, getAuthToken, handleError);");
   ctorBody.add(
-    `const api = this.annotatedApi(${apiReqSn}, ${apiReqMaker}({}));`
+    `const api = this.annotatedApi(${apiReqSn}, ${apiReqMaker}({}));`,
   );
 
   // constructor body, initialisers for api endpoints metadata class members
@@ -353,7 +360,7 @@ export async function genTypescriptService(params: GenTypescriptServiceParams) {
       ctorBody,
       apiEntry.typeExpr,
       apiEntry.name,
-      getComment(apiEntry)
+      getComment(apiEntry),
     );
   }
   classBody.add("}");
@@ -371,7 +378,7 @@ export async function genTypescriptService(params: GenTypescriptServiceParams) {
       classBody,
       apiEntry.typeExpr,
       apiEntry.name,
-      getComment(apiEntry)
+      getComment(apiEntry),
     );
   }
   code.add("");
@@ -381,6 +388,6 @@ export async function genTypescriptService(params: GenTypescriptServiceParams) {
   }
   await Deno.writeFile(
     outputFile,
-    new TextEncoder().encode(code.write().join("\n"))
+    new TextEncoder().encode(code.write().join("\n")),
   );
 }

@@ -102,11 +102,11 @@ async function main() {
     // written by hand
     Deno.copyFile(
       repo + "/sql/adl-gen/adl-tables.latest.sql",
-      repo + "/rust/server/migrations/00000000000020_adl-tables.latest.sql"
+      repo + "/rust/server/migrations/00000000000020_adl-tables.latest.sql",
     );
     Deno.copyFile(
       repo + "/sql/adl-gen/adl-views.latest.sql",
-      repo + "/rust/server/migrations/00000000000030_adl-views.latest.sql"
+      repo + "/rust/server/migrations/00000000000030_adl-views.latest.sql",
     );
   }
 }

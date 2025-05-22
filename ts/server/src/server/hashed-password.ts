@@ -8,7 +8,7 @@ export async function makeHashedPassword(plaintextPassword: string): Promise<str
 export async function checkHashedPassword(plaintextPassword: string, hashedPassword: string): Promise<boolean> {
   try {
     return await argon2.verify(hashedPassword, plaintextPassword);
-  } catch (error) {
+  } catch {
     return false;
   }
 }

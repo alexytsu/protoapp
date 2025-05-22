@@ -11,7 +11,7 @@ interface GenServerEndpointInterfaceParams extends AdlSourceParams {
 }
 
 export async function genServerEndpointInterface(
-  params: GenServerEndpointInterfaceParams
+  params: GenServerEndpointInterfaceParams,
 ) {
   const { outputFile, adlGenDirRel } = params;
 
@@ -21,16 +21,18 @@ export async function genServerEndpointInterface(
 
   const { importingHelper, apiRequestsStruct } = await resolveImports(
     params,
-    code
+    code,
   );
 
   // typescript: import {foo as bar} from "blah"
   importingHelper.modulesImports.forEach(
     (imports_: Set<string>, module: string) => {
-      const importedModuleFrom = `${adlGenDirRel}/${module.replace(
-        /\./g,
-        "/"
-      )}`;
+      const importedModuleFrom = `${adlGenDirRel}/${
+        module.replace(
+          /\./g,
+          "/",
+        )
+      }`;
 
       const modImports: string[] = [];
       for (const imp_ of Array.from(imports_)) {
@@ -38,12 +40,12 @@ export async function genServerEndpointInterface(
       }
 
       code.add(
-        `import { ${modImports.join(", ")} } from "${importedModuleFrom}";`
+        `import { ${modImports.join(", ")} } from "${importedModuleFrom}";`,
       );
-    }
+    },
   );
   code.add(
-    "import { AContext, addReqHandler } from '../server/adl-requests';"
+    "import { AContext, addReqHandler } from '../server/adl-requests';",
   );
   code.add("import { RESOLVER } from '@protoapp/adl';");
   code.add("import Router from 'koa-router';");
@@ -53,25 +55,29 @@ export async function genServerEndpointInterface(
   const interfaceBody = code.inner();
   for (const apiEntry of apiRequestsStruct.fields) {
     interfaceBody.add(
-      `${apiEntry.name}(ctx: AContext<${importingHelper.asReferencedName(
-        apiEntry.typeExpr.parameters[1]
-      )}>, req: ${importingHelper.asReferencedName(
-        apiEntry.typeExpr.parameters[0]
-      )}): Promise<void>;`
+      `${apiEntry.name}(ctx: AContext<${
+        importingHelper.asReferencedName(
+          apiEntry.typeExpr.parameters[1],
+        )
+      }>, req: ${
+        importingHelper.asReferencedName(
+          apiEntry.typeExpr.parameters[0],
+        )
+      }): Promise<void>;`,
     );
   }
   code.add("}");
   code.add("");
 
   code.add(
-    "export function registerEndpoints(h: Partial<Endpoints>, r: Router) {"
+    "export function registerEndpoints(h: Partial<Endpoints>, r: Router) {",
   );
   const functionBody = code.inner();
   functionBody.add("const api = makeApiRequests({});\n");
   for (const apiEntry of apiRequestsStruct.fields) {
     functionBody.add(`if (h.${apiEntry.name}) {`);
     functionBody.add(
-      `  addReqHandler(r, RESOLVER, api.${apiEntry.name}, h.${apiEntry.name}.bind(h));`
+      `  addReqHandler(r, RESOLVER, api.${apiEntry.name}, h.${apiEntry.name}.bind(h));`,
     );
     functionBody.add("}");
   }
@@ -82,6 +88,6 @@ export async function genServerEndpointInterface(
   }
   await Deno.writeFile(
     outputFile,
-    new TextEncoder().encode(code.write().join("\n"))
+    new TextEncoder().encode(code.write().join("\n")),
   );
 }

@@ -26,7 +26,9 @@ interface GenerateKyselyInterfaceParams extends AdlSourceParams {
   outputFile: string;
 }
 
-export async function genKyselyInterface(params: GenerateKyselyInterfaceParams) {
+export async function genKyselyInterface(
+  params: GenerateKyselyInterfaceParams,
+) {
   const { loadedAdl, dbResources } = await loadDbResources(params);
   generateKyselyInterface0(params.outputFile, loadedAdl, dbResources);
 }
@@ -48,7 +50,8 @@ function generateKyselyInterface0(
   for (const table of dbTables) {
     const ann = table.ann;
     const withIdPrimaryKey: boolean =
-      (ann && typeof(ann) === "object" && "withIdPrimaryKey" in ann && ann["withIdPrimaryKey"] as boolean) || false;
+      (ann && typeof ann === "object" && "withIdPrimaryKey" in ann &&
+        ann["withIdPrimaryKey"] as boolean) || false;
 
     const interfaceName = getInterfaceName(table);
     lines.push(`interface ${interfaceName} {`);

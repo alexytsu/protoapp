@@ -1,10 +1,27 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { ApiRequests, snApiRequests, makeApiRequests, LoginReq, LoginResp, RefreshReq, RefreshResp, NewMessageReq, RecentMessagesReq, Paginated, Message, UserWithId, UserDetails, WithId, QueryUsersReq } from "@protoapp/adl/protoapp/apis/ui";
+import {
+  ApiRequests,
+  snApiRequests,
+  makeApiRequests,
+  LoginReq,
+  LoginResp,
+  RefreshReq,
+  RefreshResp,
+  NewMessageReq,
+  RecentMessagesReq,
+  Paginated,
+  Message,
+  UserWithId,
+  UserDetails,
+  WithId,
+  QueryUsersReq,
+} from "@protoapp/adl/protoapp/apis/ui";
 import { Unit } from "@protoapp/adl/common/http";
 import { MessageId, AppUserId } from "@protoapp/adl/protoapp/db";
-import { AContext, addReqHandler } from '../server/adl-requests';
-import { RESOLVER } from '@protoapp/adl';
-import Router from 'koa-router';
+import { RESOLVER } from "@protoapp/adl";
+import Router from "koa-router";
+
+import { AContext, addReqHandler } from "../server/adl-requests";
 
 export interface Endpoints {
   healthy(ctx: AContext<null>, req: null): Promise<void>;
@@ -15,7 +32,7 @@ export interface Endpoints {
   recent_messages(ctx: AContext<Paginated<Message>>, req: RecentMessagesReq): Promise<void>;
   who_am_i(ctx: AContext<UserWithId>, req: null): Promise<void>;
   create_user(ctx: AContext<AppUserId>, req: UserDetails): Promise<void>;
-  update_user(ctx: AContext<Unit>, req: WithId<AppUserId,UserDetails>): Promise<void>;
+  update_user(ctx: AContext<Unit>, req: WithId<AppUserId, UserDetails>): Promise<void>;
   query_users(ctx: AContext<Paginated<UserWithId>>, req: QueryUsersReq): Promise<void>;
 }
 

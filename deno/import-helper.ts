@@ -220,7 +220,8 @@ export class ImportingHelper {
       }
     }
     if (type.typeRef.kind === "reference") {
-      const asImported = this.asImportedNames.get(type.typeRef.value) ?? type.typeRef.value.name;
+      const asImported = this.asImportedNames.get(type.typeRef.value) ??
+        type.typeRef.value.name;
       if (asImported === undefined) {
         throw new Error(
           `No asImported name found - ${type.typeRef.value.name}`,

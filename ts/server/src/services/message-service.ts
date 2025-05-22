@@ -3,12 +3,13 @@ import { AppUserId, Message, texprMessageTable } from "@protoapp/adl/protoapp/db
 import { Message as UIMessage } from "@protoapp/adl/protoapp/apis/ui";
 import { RESOLVER } from "@protoapp/adl/resolver";
 import { Kysely, Transaction } from "kysely";
+import { PageReq } from "@protoapp/adl/protoapp/apis/ui";
+import { Paginated } from "@protoapp/adl/protoapp/apis/ui";
 
 import { Database } from "../adl-gen/database";
 import { generateRandomId, getAdlTableDetails, valueFromDbObject, valueToDbObject } from "../database/adl-database";
 import { ReadWrite } from "../database/read-write";
-import { PageReq } from "@protoapp/adl/protoapp/apis/ui";
-import { Paginated } from "@protoapp/adl/protoapp/apis/ui";
+
 import { UserService } from "./user-service";
 
 const MESSAGE_TABLE = getAdlTableDetails(RESOLVER, texprMessageTable());
@@ -77,7 +78,6 @@ export class MessageService {
       .limit(page.limit)
       .offset(page.offset)
       .execute();
-    
 
     return {
       items: messages.map((m) => {

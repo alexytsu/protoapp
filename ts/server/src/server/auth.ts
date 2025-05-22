@@ -17,6 +17,7 @@ import {
 import { Database } from "../adl-gen/database";
 import { getAdlTableDetails, valueFromDbObject } from "../database/adl-database";
 import { AppConfig } from "../config/app";
+
 import { checkHashedPassword } from "./hashed-password";
 import { createAdminAccess, createUserAccess, createRefresh, decodeRefresh } from "./jwt-utils";
 import { createBiBinding } from "./adl-requests";
@@ -101,7 +102,7 @@ async function refresh(db: Kysely<Database>, appCfg: AppConfig, req: RefreshReq)
 
     const accessJwt = accessJwtFromUser(appCfg, user.id, user.value);
     return { kind: "access_token", value: accessJwt };
-  } catch (error) {
+  } catch {
     return { kind: "invalid_refresh_token" };
   }
 }

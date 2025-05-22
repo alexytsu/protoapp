@@ -18,7 +18,7 @@ export class UserEndpoints implements Partial<Endpoints> {
     this.userService = args.userService;
   }
 
-  async who_am_i(ctx: AContext<UserWithId>, req: null): Promise<void> {
+  async who_am_i(ctx: AContext<UserWithId>): Promise<void> {
     if (!ctx.endpointClaims?.sub) {
       throw new HttpException(401, "No JWT claims");
     }
@@ -34,11 +34,11 @@ export class UserEndpoints implements Partial<Endpoints> {
     return ctx.setAdlResponse(user?.id);
   }
 
-  async update_user(ctx: AContext<Unit>, req: WithId<AppUserId, UserDetails>): Promise<void> {
+  async update_user(_ctx: AContext<Unit>, _req: WithId<AppUserId, UserDetails>): Promise<void> {
     throw new Error("update_user not implemented");
   }
 
-  async query_users(ctx: AContext<Paginated<UserWithId>>, req: QueryUsersReq): Promise<void> {
+  async query_users(_ctx: AContext<Paginated<UserWithId>>, _req: QueryUsersReq): Promise<void> {
     throw new Error("query_users not implemented");
   }
 }

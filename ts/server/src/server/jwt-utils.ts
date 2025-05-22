@@ -1,9 +1,10 @@
 import JWT from "jwt-simple";
 import { Context } from "koa";
 
+import { AppConfig } from "../config/app";
+
 import { HttpException } from "./http-exception";
 import { UserRole } from "./adl-requests";
-import { AppConfig } from "../config/app";
 
 export interface AccessClaims {
   iss: string;
@@ -98,7 +99,7 @@ function createAccessToken(cfg: AppConfig, role: string, sub: string): string {
 export function decodeAccess(jwtSecret: string, jwt: string): AccessClaims {
   try {
     return JWT.decode(jwt, jwtSecret, false, "HS256");
-  } catch (error) {
+  } catch {
     throw new HttpException(401, "Invalid access token");
   }
 }
@@ -106,7 +107,7 @@ export function decodeAccess(jwtSecret: string, jwt: string): AccessClaims {
 export function decodeRefresh(jwtSecret: string, jwt: string): RefreshClaims {
   try {
     return JWT.decode(jwt, jwtSecret, false, "HS256");
-  } catch (error) {
+  } catch {
     throw new HttpException(401, "Invalid refresh token");
   }
 }
