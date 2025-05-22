@@ -4,6 +4,8 @@ import { AdlcError, genRust, genTypescript } from "@adllang/adlc-tools";
 import { genAdlTsPackage } from "./gen-adl-ts-package.ts";
 import { genCreateSqlSchema } from "./gen-sqlschema.ts";
 import { genRustSeaQuerySchema } from "./gen-rs-seaquery-schema.ts";
+import { genKyselyInterface } from "./gen-kysely-interface.ts";
+import { genServerEndpointInterface } from "./gen-server-endpoint-interface.ts";
 
 async function main() {
   const repo = getRepoRoot();
@@ -59,6 +61,27 @@ async function main() {
       ...commonFlags,
       adlModules: ["protoapp.db"],
       outputFile: outputDir + "/db/schema.rs",
+    });
+  }
+
+  {
+    //----------------------------------------------------------------------
+    // Generate typescript for the server
+    const outputDir = repo + "/ts/server/src/adl-gen";
+    await genKyselyInterface({
+      ...commonFlags,
+      adlModules: ["protoapp.db"],
+      outputFile: outputDir + "/database.ts",
+    });
+
+    await genServerEndpointInterface({
+      ...commonFlags,
+      adlModules: ["protoapp.apis.ui", "protoapp.db"],
+      outputFile: outputDir + "/endpoints.ts",
+      apiModule: "protoapp.apis.ui",
+      apiName: "ApiRequests",
+      adlGenDirRel: "@protoapp/adl",
+      verbose: true,
     });
   }
 

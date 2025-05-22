@@ -24,7 +24,8 @@ pub fn build_routes(state: AppState) -> Box<dyn DynEndpoint<Output = poem::Respo
         )
         .adl_req(ApiRequests::def_create_user(), handlers::create_user)
         .adl_req(ApiRequests::def_update_user(), handlers::update_user)
-        .adl_req(ApiRequests::def_query_users(), handlers::query_users);
+        .adl_req(ApiRequests::def_query_users(), handlers::query_users)
+        .adl_req(ApiRequests::def_signup(), handlers::signup);
 
     // Add handlers that need custom cookie handling
     let routes = routes

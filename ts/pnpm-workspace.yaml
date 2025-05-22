@@ -2,6 +2,7 @@ packages:
   - "adl"
   - "api-workbench"
   - "ui"
+  - "server"
   - "prettier-config"
 
 catalog:
