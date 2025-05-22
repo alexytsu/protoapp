@@ -14,7 +14,7 @@ import protoapp.db.MessageId;
 struct ApiRequests {
 
   /// AWS default compatible health check
-  HttpReq<Void,Void> healthy = {
+  HttpReq<Void, Void> healthy = {
     "method": "get",
     "path": "/",
     "security" : "public"

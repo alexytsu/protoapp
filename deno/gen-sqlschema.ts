@@ -394,7 +394,7 @@ function assumeField<T>(obj: Json | undefined, key: string): T | undefined {
 /**
  * Returns the SQL name for a column corresponding to a field
  */
-function getColumnName(field: adlast.Field): string {
+export function getColumnName(field: adlast.Field): string {
   const ann = getAnnotation(field.annotations, DB_COLUMN_NAME);
   if (typeof ann === "string") {
     return ann;
