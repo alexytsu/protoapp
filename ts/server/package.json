@@ -3,7 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "description": "TypeScript server for protoapp",
-  "main": "src/server.ts",
+  "main": "dist/index.js",
   "scripts": {
     "check": "tsc --noEmit && eslint src/ test/  --ext .ts,.tsx --max-warnings=0 && prettier --check 'src/**/*.{js,jsx,ts,tsx}'",
     "lint": "eslint src/ test/  --ext .ts,.tsx --max-warnings=0",
