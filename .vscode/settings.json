@@ -10,11 +10,30 @@
       "args": ["-i"],
       "env": {
         "ZDOTDIR": "${workspaceFolder}/.vscode",
-        "ZSH_COMPDUMP": "${workspaceFolder}/.vscode/.zshcompdump",
+        "ZSH_COMPDUMP": "${workspaceFolder}/.vscode/.zshcompdump"
       },
       "icon": "terminal-bash"
     }
   },
   "terminal.integrated.defaultProfile.osx": "zsh (local-setup)",
-  "terminal.integrated.shellIntegration.enabled": true
+  "terminal.integrated.shellIntegration.enabled": true,
+  "eslint.enable": true,
+  "eslint.validate": [
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact"
+  ],
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit",
+  },
+  "eslint.workingDirectories": [
+    {
+      "pattern": "ts/ui/*"
+    },
+    {
+      "pattern": "ts/server/*"
+    }
+  ]
 }

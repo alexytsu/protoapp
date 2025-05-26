@@ -3,3 +3,5 @@
 .vscode/.zshcompdump
 .vscode/.zshcompdump.zwc
 .idea/
+
+.opencode/

@@ -1,16 +1,36 @@
+import { BrowserRouter } from "react-router-dom";
+
 import { LoginScreenView } from "./LoginScreenView";
 
 export default {
   component: LoginScreenView,
   title: "Screens/LoginScreenView",
   parameters: {
-    layout: "fullscreen",
+    layout: "centered",
   },
+  decorators: [
+    (Story) => (
+      <BrowserRouter>
+        <Story />
+      </BrowserRouter>
+    ),
+  ],
 };
 
 export const Default = {
   args: {
-    onLogin: () => console.log("Login clicked"),
-    onRegister: () => console.log("Register clicked"),
+    email: "",
+    onEmailChange: () => {},
+    password: "",
+    onPasswordChange: () => {},
+    onSubmit: (e) => e.preventDefault(),
+  },
+};
+
+export const Filled = {
+  args: {
+    ...Default.args,
+    email: "user@example.com",
+    password: "password123",
   },
 };

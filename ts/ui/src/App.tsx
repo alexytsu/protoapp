@@ -8,6 +8,7 @@ import { FetchHttp } from "@/service/fetch-http";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ModeToggle } from "@/components/mode-toggle";
 import { LoginScreen } from "@/screens/LoginScreen";
+import { SignupScreen } from "@/screens/SignupScreen";
 import { MessagesScreen } from "@/screens/MessagesScreen";
 
 const service = new Service(new FetchHttp(), "/api");
@@ -105,6 +106,32 @@ const App: React.FC = () => {
     }
   };
 
+  const handleSignup = async (email: string, fullname: string, password: string): Promise<boolean> => {
+    try {
+      const response = await service.signup({ email, fullname, password });
+      if (response === "success") {
+        // Automatically log the user in after successful signup
+        const loginResponse = await service.login({ email, password });
+        if (loginResponse.kind === "tokens") {
+          setAccessToken(loginResponse.value.access_jwt);
+          return true;
+        } else {
+          // This shouldn't happen normally since we just created the account
+          alert("Account created, but login failed. Please try logging in manually.");
+          return false;
+        }
+      } else if (response === "email_already_exists") {
+        alert("An account with this email already exists.");
+        return false;
+      }
+      return false;
+    } catch (err) {
+      handleApiError(err);
+      alert("An error occurred during signup. Please try again.");
+      return false;
+    }
+  };
+
   const handleLogout = useCallback(async () => {
     if (!accessToken) return; // Should not happen if called from MessagesScreen, but good practice
     try {
@@ -141,6 +168,7 @@ const App: React.FC = () => {
           <main className="flex-grow">
             <Routes>
               <Route path="/login" element={<LoginScreen accessToken={accessToken} onLogin={handleLogin} />} />
+              <Route path="/signup" element={<SignupScreen accessToken={accessToken} onSignup={handleSignup} />} />
 
               <Route
                 path="/messages"

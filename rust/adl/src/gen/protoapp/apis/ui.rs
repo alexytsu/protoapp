@@ -30,6 +30,12 @@ pub struct ApiRequests {
   pub login: HttpReq<LoginReq, LoginResp>,
 
   /**
+   * Signup a user
+   */
+  #[serde(default="ApiRequests::def_signup")]
+  pub signup: HttpReq<SignupReq, SignupResp>,
+
+  /**
    * Get a refreshed access token
    * If the refresh token is not provided in the request body, then it will
    * be read from the refrestToken cookie in the request.
@@ -85,6 +91,7 @@ impl ApiRequests {
     ApiRequests {
       healthy: ApiRequests::def_healthy(),
       login: ApiRequests::def_login(),
+      signup: ApiRequests::def_signup(),
       refresh: ApiRequests::def_refresh(),
       logout: ApiRequests::def_logout(),
       new_message: ApiRequests::def_new_message(),
@@ -102,6 +109,10 @@ impl ApiRequests {
 
   pub fn def_login() -> HttpReq<LoginReq, LoginResp> {
     HttpReq::<LoginReq, LoginResp>{method : HttpMethod::Post, path : "/login".to_string(), security : HttpSecurity::Public, req_type : std::marker::PhantomData, resp_type : std::marker::PhantomData}
+  }
+
+  pub fn def_signup() -> HttpReq<SignupReq, SignupResp> {
+    HttpReq::<SignupReq, SignupResp>{method : HttpMethod::Post, path : "/signup".to_string(), security : HttpSecurity::Public, req_type : std::marker::PhantomData, resp_type : std::marker::PhantomData}
   }
 
   pub fn def_refresh() -> HttpReq<RefreshReq, RefreshResp> {
@@ -160,6 +171,34 @@ pub enum LoginResp {
 
   #[serde(rename="invalid_credentials")]
   InvalidCredentials,
+}
+
+#[derive(Clone,Deserialize,Eq,Hash,PartialEq,Serialize)]
+pub struct SignupReq {
+  pub email: StringNE,
+
+  pub fullname: StringNE,
+
+  pub password: Password,
+}
+
+impl SignupReq {
+  pub fn new(email: StringNE, fullname: StringNE, password: Password) -> SignupReq {
+    SignupReq {
+      email: email,
+      fullname: fullname,
+      password: password,
+    }
+  }
+}
+
+#[derive(Clone,Deserialize,Eq,Hash,PartialEq,Serialize)]
+pub enum SignupResp {
+  #[serde(rename="success")]
+  Success,
+
+  #[serde(rename="email_already_exists")]
+  EmailAlreadyExists,
 }
 
 #[derive(Clone,Deserialize,Eq,Hash,PartialEq,Serialize)]

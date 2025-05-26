@@ -120,7 +120,7 @@ cargo test -- --test-threads=1
 (
 cd rust/server
 export PROTOAPP_SERVER_CONFIG='{
-  "http_bind_addr": "0.0.0.0:8081",
+  "http_bind_addr": "0.0.0.0:8080",
   "db": {
     "host": "localhost",
     "port": 5432,
